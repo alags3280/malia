@@ -5,7 +5,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Malia — Personal Finance</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=Fraunces:ital,wght@0,300;0,600;1,300;1,600&display=swap" rel="stylesheet"/>
 <style>
 :root {
   --bg: #f5f2ec;
@@ -35,12 +35,16 @@ body{background:var(--bg);color:var(--ink);font-family:'Syne',sans-serif;min-hei
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
 
 /* NAV */
-.nav{position:fixed;bottom:0;left:0;right:0;background:var(–card);border-top:1px solid var(–border);display:flex;justify-content:space-around;align-items:center;padding:8px 0 14px;z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,.06);}
-.nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;color:var(–ink3);font-family:‘Syne’,sans-serif;font-size:9px;letter-spacing:.02em;padding:2px 6px;border-radius:12px;transition:all .2s;}
+.nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(–border);display:flex;justify-content:space-around;align-items:center;padding:10px 4px 22px;z-index:100;box-shadow:0 -8px 32px rgba(26,24,20,.08);}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:pointer;color:var(–ink3);font-family:‘Syne’,sans-serif;font-size:9px;letter-spacing:.03em;padding:4px 8px;border-radius:14px;transition:all .25s;min-width:48px;}
 .nav-btn.active{color:var(–gold);}
-.nav-btn svg{width:20px;height:20px;}
-.nav-icon{width:36px;height:36px;background:var(–gold);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(200,150,60,.35);}
-.nav-icon svg{width:18px;height:18px;color:#fff;}
+.nav-btn-icon{width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;transition:all .25s;background:transparent;margin-bottom:1px;}
+.nav-btn.active .nav-btn-icon{background:var(–gold-light);transform:translateY(-2px);}
+.nav-btn svg{width:19px;height:19px;transition:all .25s;}
+.nav-add-btn{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:pointer;font-family:‘Syne’,sans-serif;font-size:9px;letter-spacing:.03em;color:var(–gold);padding:0 8px;min-width:48px;}
+.nav-add-icon{width:48px;height:48px;background:linear-gradient(135deg,var(–gold),#e8b05a);border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(200,150,60,.45);transform:translateY(-10px);transition:transform .2s;}
+.nav-add-icon svg{width:22px;height:22px;color:#fff;}
+.nav-add-label{margin-top:-6px;}
 
 /* PAGES */
 .page{display:none;padding:0;animation:fadeIn .25s ease;}
@@ -51,7 +55,8 @@ body{background:var(--bg);color:var(--ink);font-family:'Syne',sans-serif;min-hei
 .page-header{padding:52px 20px 20px;background:linear-gradient(160deg,#1a1814 0%,#2e2a22 100%);position:relative;overflow:hidden;}
 .page-header::before{content:’’;position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(200,150,60,.18) 0%,transparent 70%);pointer-events:none;}
 .page-header::after{content:’’;position:absolute;bottom:-20px;left:20px;width:120px;height:120px;background:radial-gradient(circle,rgba(200,150,60,.1) 0%,transparent 70%);pointer-events:none;}
-.greeting{font-size:12px;color:rgba(255,255,255,.45);letter-spacing:.1em;margin-bottom:4px;}
+.greeting{font-size:28px;color:#fff;font-family:‘Fraunces’,serif;font-weight:300;font-style:italic;letter-spacing:-.01em;margin-bottom:2px;}
+.greeting strong{font-style:normal;font-weight:600;color:var(–gold);}
 .page-title{font-family:‘Instrument Serif’,serif;font-size:28px;color:#fff;font-style:italic;font-weight:400;}
 .page-title span{color:var(–gold);font-style:normal;}
 .header-badge{display:inline-block;background:rgba(200,150,60,.15);border:1px solid rgba(200,150,60,.3);color:var(–gold);font-size:11px;padding:4px 12px;border-radius:20px;margin-top:10px;letter-spacing:.06em;}
@@ -213,11 +218,37 @@ select.form-input option{background:#fff;}
 .bar-bg{height:8px;background:var(–bg2);border-radius:4px;overflow:hidden;}
 .bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(–red),#d97070);transition:width .5s;}
 
+/* VIEW TOGGLE */
+.view-toggle-btn{flex:1;background:var(–bg2);border:none;color:var(–ink2);font-family:‘Syne’,sans-serif;font-size:12px;font-weight:600;padding:10px;border-radius:10px;cursor:pointer;transition:all .2s;letter-spacing:.03em;}
+.view-toggle-btn.active-view{background:var(–ink);color:#fff;}
+
+/* CALENDAR */
+.cal-day{border-radius:10px;padding:4px 2px;min-height:54px;cursor:pointer;transition:all .2s;position:relative;display:flex;flex-direction:column;align-items:center;}
+.cal-day:hover{background:var(–bg2);}
+.cal-day.selected{background:var(–gold-light);border:1.5px solid var(–gold);}
+.cal-day.today .cal-num{background:var(–gold);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+.cal-day.empty{cursor:default;pointer-events:none;}
+.cal-num{font-size:12px;font-weight:600;color:var(–ink);margin-bottom:3px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+.cal-dot-exp{width:5px;height:5px;border-radius:50%;background:var(–red);margin:1px auto;}
+.cal-dot-inc{width:5px;height:5px;border-radius:50%;background:var(–green);margin:1px auto;}
+.cal-amt{font-size:8px;color:var(–red);font-weight:700;text-align:center;line-height:1.2;margin-top:1px;}
+.cal-day.has-income .cal-amt{color:var(–green);}
+.cal-day.has-both .cal-amt{color:var(–red);}
+
+/* FONT & THEME OPTIONS */
+.font-opt-btn{width:100%;background:var(–bg2);border:1.5px solid var(–border);color:var(–ink);padding:14px 16px;border-radius:12px;cursor:pointer;font-size:15px;text-align:left;transition:all .2s;}
+.font-opt-btn.active-font{background:var(–gold-light);border-color:var(–gold);color:var(–gold);}
+.color-swatch{width:42px;height:42px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:all .2s;outline:none;}
+.color-swatch:hover{transform:scale(1.1);}
+.color-swatch.active-swatch{border-color:var(–ink);transform:scale(1.1);}
+
 /* BILL MARK PAID */
 .mark-paid-btn{background:var(–green-light);border:none;color:var(–green);font-size:10px;font-family:‘Syne’,sans-serif;padding:4px 10px;border-radius:8px;cursor:pointer;font-weight:600;margin-top:4px;transition:all .2s;}
 .mark-paid-btn:hover{background:var(–green);color:#fff;}
 .paid-badge{font-size:10px;color:var(–green);font-weight:600;margin-top:4px;}
 
+.sum-card.savings{background:linear-gradient(135deg,#1a1814,#2e2a22);border:1px solid rgba(200,150,60,.2);}
+.sum-card.savings .sum-label{color:rgba(255,255,255,.5) !important;}
 @media(max-width:360px){.nw-value{font-size:22px;}.sum-value{font-size:18px;}}
 </style>
 
@@ -230,8 +261,7 @@ select.form-input option{background:#fff;}
 
 <div id="page-home" class="page active">
   <div class="page-header">
-    <div class="greeting">WELCOME BACK</div>
-    <div class="page-title">Your <span>Malia</span></div>
+    <div class="greeting">Welcome back, <strong>Alags</strong> 👋</div>
     <div class="header-badge" id="monthBadge"></div>
   </div>
   <div class="networth-strip">
@@ -255,6 +285,24 @@ select.form-input option{background:#fff;}
         <div class="sum-label">EXPENSES</div>
         <div class="sum-value" id="homeTotalExpense">AED 0</div>
         <div class="sum-count" id="homeExpenseCount">0 transactions</div>
+      </div>
+    </div>
+    <!-- Savings full width card -->
+    <div class="sum-card savings" style="margin-top:12px;border-radius:var(--radius);padding:18px;position:relative;overflow:hidden;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div class="sum-label" style="color:var(--ink2);">TOTAL SAVINGS</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:26px;color:var(--gold);margin-top:4px;" id="homeTotalSavings">AED 0</div>
+          <div style="font-size:11px;color:var(--ink3);margin-top:4px;" id="homeSavingsCount">across 0 goals</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:10px;color:var(--ink2);letter-spacing:.06em;margin-bottom:6px;">OVERALL PROGRESS</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:22px;color:var(--gold);" id="homeSavingsPct">0%</div>
+          <div style="font-size:11px;color:var(--ink3);margin-top:2px;" id="homeSavingsRemaining">AED 0 to go</div>
+        </div>
+      </div>
+      <div style="margin-top:14px;">
+        <div class="progress-bar"><div class="progress-fill" id="homeSavingsBar" style="width:0%"></div></div>
       </div>
     </div>
   </div>
@@ -283,25 +331,54 @@ select.form-input option{background:#fff;}
     <div class="month-label" id="txnMonthLabel"></div>
     <button class="month-btn" onclick="changeMonth(1)">›</button>
   </div>
-  <div class="section" style="margin-top:16px;">
-    <div class="summary-grid">
-      <div class="sum-card income">
-        <div class="sum-label">INCOME</div>
-        <div class="sum-value" id="txnIncome">AED 0</div>
-      </div>
-      <div class="sum-card expense">
-        <div class="sum-label">EXPENSES</div>
-        <div class="sum-value" id="txnExpense">AED 0</div>
+
+  <!-- View toggle -->
+
+  <div style="display:flex;gap:8px;padding:12px 20px 0;">
+    <button id="viewToggleList" onclick="setTxnView('list')" class="view-toggle-btn active-view">☰ List</button>
+    <button id="viewToggleCal" onclick="setTxnView('calendar')" class="view-toggle-btn">📅 Calendar</button>
+  </div>
+
+  <!-- LIST VIEW -->
+
+  <div id="listView">
+    <div class="section" style="margin-top:16px;">
+      <div class="summary-grid">
+        <div class="sum-card income">
+          <div class="sum-label">INCOME</div>
+          <div class="sum-value" id="txnIncome">AED 0</div>
+        </div>
+        <div class="sum-card expense">
+          <div class="sum-label">EXPENSES</div>
+          <div class="sum-value" id="txnExpense">AED 0</div>
+        </div>
       </div>
     </div>
+    <div class="section" style="margin-top:16px;">
+      <div class="section-title">CATEGORY BREAKDOWN</div>
+      <div class="card"><div class="cat-chart" id="catChart"></div></div>
+    </div>
+    <div class="section" style="margin-top:16px;">
+      <div class="section-title">ALL TRANSACTIONS</div>
+      <div class="card" id="allTxns"></div>
+    </div>
   </div>
-  <div class="section" style="margin-top:16px;">
-    <div class="section-title">CATEGORY BREAKDOWN</div>
-    <div class="card"><div class="cat-chart" id="catChart"></div></div>
-  </div>
-  <div class="section" style="margin-top:16px;">
-    <div class="section-title">ALL TRANSACTIONS</div>
-    <div class="card" id="allTxns"></div>
+
+  <!-- CALENDAR VIEW -->
+
+  <div id="calendarView" style="display:none;">
+    <div class="section" style="margin-top:16px;">
+      <div class="card" style="padding:16px;">
+        <!-- Day headers -->
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:8px;">
+          ${['S','M','T','W','T','F','S'].map(d=>`<div style="text-align:center;font-size:10px;font-weight:700;color:var(--ink3);letter-spacing:.06em;padding:4px 0;">${d}</div>`).join('')}
+        </div>
+        <!-- Calendar grid -->
+        <div id="calGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;"></div>
+      </div>
+    </div>
+    <!-- Selected day detail -->
+    <div class="section" style="margin-top:16px;" id="calDayDetail" style="display:none;"></div>
   </div>
 </div>
 
@@ -385,25 +462,110 @@ select.form-input option{background:#fff;}
     <div class="page-title">Set<span>tings</span></div>
   </div>
 
-  <!-- UPDATE APP -->
+  <!-- SMS SHORTCUT -->
 
   <div class="section" style="margin-top:20px;">
-    <div class="section-title">APP VERSION</div>
+    <div class="section-title">SMS AUTO-CAPTURE</div>
     <div class="card" style="padding:18px;">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-        <div style="width:44px;height:44px;background:var(--gold-light);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">⚡</div>
+        <div style="width:44px;height:44px;background:var(--blue-light);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">📲</div>
         <div>
-          <div style="font-size:14px;font-weight:600;">Malia Finance</div>
-          <div style="font-size:11px;color:var(--ink3);margin-top:2px;" id="appVersionLabel">Tap below to check for updates</div>
+          <div style="font-size:14px;font-weight:600;">iPhone Shortcuts Integration</div>
+          <div style="font-size:11px;color:var(--ink3);margin-top:2px;">Auto-capture ADCB & ENBD transactions</div>
         </div>
       </div>
-      <div style="font-size:12px;color:var(--ink2);margin-bottom:14px;line-height:1.6;">
-        Tap <strong>Update App</strong> to get the latest features. Your data (transactions, goals, bills) is always kept safe — it lives in your browser storage, not in the app code.
+      <div style="background:var(--bg2);border-radius:12px;padding:14px;margin-bottom:14px;">
+        <div style="font-size:12px;color:var(--ink2);line-height:1.7;">
+          When your bank sends an SMS, the iPhone Shortcut will automatically parse it and open Malia with the transaction pre-filled. One tap to confirm! 🎉
+        </div>
       </div>
-      <button onclick="updateApp()" id="updateBtn" style="width:100%;background:linear-gradient(135deg,var(--gold),#e8b05a);border:none;color:#fff;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;padding:14px;border-radius:12px;cursor:pointer;letter-spacing:.06em;box-shadow:0 4px 16px rgba(200,150,60,.3);transition:opacity .2s;">
-        ⚡ UPDATE APP
+      <div style="font-size:11px;color:var(--ink2);letter-spacing:.06em;margin-bottom:10px;">YOUR APP LINK FOR SHORTCUT</div>
+      <div style="background:var(--bg2);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <div style="font-size:12px;color:var(--gold);flex:1;word-break:break-all;" id="appLinkDisplay">https://earnest-gumdrop-2763d9.netlify.app</div>
+        <button onclick="copyAppLink()" style="background:var(--gold);border:none;color:#fff;font-family:'Syne',sans-serif;font-size:11px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer;white-space:nowrap;">Copy</button>
+      </div>
+      <div style="font-size:11px;color:var(--ink2);letter-spacing:.06em;margin-bottom:10px;">SETUP STEPS</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:24px;height:24px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">1</div>
+          <div style="font-size:12px;color:var(--ink2);line-height:1.6;">Open the <strong>Shortcuts</strong> app on your iPhone</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:24px;height:24px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">2</div>
+          <div style="font-size:12px;color:var(--ink2);line-height:1.6;">Tap <strong>Automation</strong> → <strong>New Automation</strong> → <strong>Message</strong></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:24px;height:24px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">3</div>
+          <div style="font-size:12px;color:var(--ink2);line-height:1.6;">Set sender to <strong>ADCB</strong> or <strong>ENBD</strong> → tap Next</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:24px;height:24px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">4</div>
+          <div style="font-size:12px;color:var(--ink2);line-height:1.6;">Add action: <strong>Open URLs</strong> → paste the URL below (tap Copy first)</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:24px;height:24px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">5</div>
+          <div style="font-size:12px;color:var(--ink2);line-height:1.6;">Replace the URL with: <strong style="color:var(--gold);word-break:break-all;" id="shortcutUrlDisplay"></strong></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:24px;height:24px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">6</div>
+          <div style="font-size:12px;color:var(--ink2);line-height:1.6;">Turn off <strong>"Ask Before Running"</strong> → Save</div>
+        </div>
+      </div>
+      <button onclick="openSmsModal()" style="width:100%;background:var(--blue-light);border:none;color:var(--blue);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;padding:13px;border-radius:12px;cursor:pointer;letter-spacing:.04em;transition:all .2s;">
+        📋 Or Paste SMS Manually
       </button>
-      <div id="updateStatus" style="margin-top:10px;font-size:12px;text-align:center;color:var(--ink3);display:none;"></div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+
+  <div class="section" style="margin-top:20px;">
+    <div class="section-title">YOUR PROFILE</div>
+    <div class="card" style="padding:18px;">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+        <div style="position:relative;">
+          <div id="profilePicDisplay" style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#e8b05a);display:flex;align-items:center;justify-content:center;font-size:28px;font-family:'Fraunces',serif;color:#fff;font-weight:600;overflow:hidden;flex-shrink:0;">A</div>
+          <button onclick="document.getElementById('profilePicInput').click()" style="position:absolute;bottom:0;right:0;width:24px;height:24px;background:var(--ink);border:2px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;">✏️</button>
+          <input type="file" id="profilePicInput" accept="image/*" onchange="uploadProfilePic(event)" style="display:none;"/>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:16px;font-weight:700;" id="profileNameDisplay">Alags</div>
+          <div style="font-size:11px;color:var(--ink3);margin-top:2px;">Tap the pencil to change photo</div>
+          <button onclick="openEditNameModal()" style="margin-top:8px;background:var(--gold-light);border:none;color:var(--gold);font-family:'Syne',sans-serif;font-size:11px;font-weight:600;padding:5px 12px;border-radius:8px;cursor:pointer;">✏️ Edit Name</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FONT & THEME -->
+
+  <div class="section" style="margin-top:20px;">
+    <div class="section-title">FONT STYLE</div>
+    <div class="card" style="padding:18px;">
+      <div style="font-size:12px;color:var(--ink2);margin-bottom:14px;">Choose your preferred font for the app</div>
+      <div style="display:flex;flex-direction:column;gap:10px;" id="fontOptions">
+        <button onclick="setFont('syne')" class="font-opt-btn active-font" id="font-syne" style="font-family:'Syne',sans-serif;">Syne — Modern & Clean</button>
+        <button onclick="setFont('fraunces')" class="font-opt-btn" id="font-fraunces" style="font-family:'Fraunces',serif;font-style:italic;">Fraunces — Elegant Serif</button>
+        <button onclick="setFont('instrument')" class="font-opt-btn" id="font-instrument" style="font-family:'Instrument Serif',serif;">Instrument — Classic</button>
+        <button onclick="setFont('mono')" class="font-opt-btn" id="font-mono" style="font-family:'DM Mono',monospace;">DM Mono — Tech</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- THEME COLOR -->
+
+  <div class="section" style="margin-top:20px;">
+    <div class="section-title">ACCENT COLOR</div>
+    <div class="card" style="padding:18px;">
+      <div style="font-size:12px;color:var(--ink2);margin-bottom:14px;">Pick your accent color</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <button onclick="setAccent('#c8963c','#f5e6cc')" class="color-swatch" style="background:#c8963c;" title="Gold"></button>
+        <button onclick="setAccent('#2d6a4f','#d8ede5')" class="color-swatch" style="background:#2d6a4f;" title="Green"></button>
+        <button onclick="setAccent('#2c4a7c','#dce5f5')" class="color-swatch" style="background:#2c4a7c;" title="Blue"></button>
+        <button onclick="setAccent('#7c2c6a','#f0d8ec')" class="color-swatch" style="background:#7c2c6a;" title="Purple"></button>
+        <button onclick="setAccent('#b83232','#f5dada')" class="color-swatch" style="background:#b83232;" title="Red"></button>
+        <button onclick="setAccent('#5c5c3d','#eeeedd')" class="color-swatch" style="background:#5c5c3d;" title="Olive"></button>
+      </div>
     </div>
   </div>
 
@@ -423,6 +585,69 @@ select.form-input option{background:#fff;}
       <div style="font-size:13px;color:var(--ink2);margin-bottom:12px;">Reset all categories back to defaults. Your transactions will not be deleted.</div>
       <button onclick="resetCategories()" style="background:var(--red-light);border:none;color:var(--red);font-family:'Syne',sans-serif;font-size:13px;font-weight:600;padding:10px 20px;border-radius:10px;cursor:pointer;width:100%;">Reset to Default Categories</button>
     </div>
+  </div>
+</div>
+
+<!-- EDIT NAME MODAL -->
+
+<div class="overlay" id="nameOverlay" onclick="closeEditNameModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Edit Your Name</div>
+    <div class="form-group">
+      <label class="form-label">YOUR NAME</label>
+      <input class="form-input" type="text" id="nameInput" placeholder="Enter your name"/>
+    </div>
+    <button class="submit-btn" onclick="saveName()">SAVE NAME</button>
+    <button class="cancel-btn" onclick="closeEditNameModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- SMS MODAL -->
+
+<div class="overlay" id="smsOverlay" onclick="closeSmsModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📲 Paste Bank SMS</div>
+    <div style="font-size:12px;color:var(--ink2);margin-bottom:14px;line-height:1.6;">Copy an SMS from ADCB or ENBD and paste it below. Malia will automatically extract the transaction details.</div>
+    <div class="form-group">
+      <label class="form-label">PASTE SMS HERE</label>
+      <textarea class="form-input" id="smsText" placeholder="e.g. Your ADCB account was debited AED 250.00 at CARREFOUR on 25/03/2026..." style="height:100px;resize:none;line-height:1.6;"></textarea>
+    </div>
+    <button class="submit-btn" onclick="parseSms()">🔍 EXTRACT TRANSACTION</button>
+    <button class="cancel-btn" onclick="closeSmsModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- SMS CONFIRM MODAL -->
+
+<div class="overlay" id="smsConfirmOverlay" onclick="closeSmsConfirm(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">✅ Confirm Transaction</div>
+    <div style="font-size:12px;color:var(--ink2);margin-bottom:16px;">We extracted the following — review and confirm:</div>
+    <div class="type-toggle" style="margin-bottom:14px;">
+      <button id="smsExpBtn" class="type-btn expense-on" onclick="setSmsType('expense')">— Expense</button>
+      <button id="smsIncBtn" class="type-btn off" onclick="setSmsType('income')">+ Income</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">AMOUNT (AED)</label>
+      <input class="form-input" type="number" id="smsAmount" min="0" step="0.01"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">CATEGORY</label>
+      <select class="form-input" id="smsCategory"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">NOTE</label>
+      <input class="form-input" type="text" id="smsNote"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">DATE</label>
+      <input class="form-input" type="date" id="smsDate"/>
+    </div>
+    <button class="submit-btn" onclick="confirmSmsTransaction()">✅ SAVE TRANSACTION</button>
+    <button class="cancel-btn" onclick="closeSmsConfirm()">Cancel</button>
   </div>
 </div>
 
@@ -449,31 +674,45 @@ select.form-input option{background:#fff;}
 
 <nav class="nav">
   <button class="nav-btn active" onclick="showPage('home')" id="nav-home">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <div class="nav-btn-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
     Home
   </button>
   <button class="nav-btn" onclick="showPage('transactions')" id="nav-transactions">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-    Transactions
+    <div class="nav-btn-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+    </div>
+    Txns
   </button>
-  <button class="nav-btn" onclick="openTxnModal()">
-    <div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
-    Add
+  <button class="nav-add-btn" onclick="openTxnModal()">
+    <div class="nav-add-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </div>
+    <span class="nav-add-label">Add</span>
   </button>
   <button class="nav-btn" onclick="showPage('savings')" id="nav-savings">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><path d="M12 6v6l4 2"/></svg>
+    <div class="nav-btn-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><path d="M12 6v6l4 2"/></svg>
+    </div>
     Goals
   </button>
   <button class="nav-btn" onclick="showPage('reports')" id="nav-reports">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <div class="nav-btn-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    </div>
     Reports
   </button>
   <button class="nav-btn" onclick="showPage('bills')" id="nav-bills">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <div class="nav-btn-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    </div>
     Bills
   </button>
   <button class="nav-btn" onclick="showPage('settings')" id="nav-settings">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <div class="nav-btn-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </div>
     Settings
   </button>
 </nav>
@@ -594,7 +833,7 @@ select.form-input option{background:#fff;}
 
 <!-- PAGE-SPECIFIC FABS -->
 
-<button class="fab" id="mainFab" onclick="handleFab()">
+<button class="fab" id="mainFab" onclick="handleFab()" style="display:none;">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
 </button>
 
@@ -629,7 +868,7 @@ function showPage(p) {
   if (nb) nb.classList.add('active');
   // Update FAB icon/visibility
   const fab = document.getElementById('mainFab');
-  fab.style.display = ['home','transactions','reports','settings'].includes(p) ? 'none' : 'flex';
+  fab.style.display = ['savings','bills'].includes(p) ? 'flex' : 'none';
   renderPage(p);
 }
 
@@ -682,6 +921,18 @@ function renderHome() {
   document.getElementById('homeTotalExpense').textContent = fmt(expense);
   document.getElementById('homeIncomeCount').textContent = monthly.filter(t=>t.type==='income').length + ' transactions';
   document.getElementById('homeExpenseCount').textContent = monthly.filter(t=>t.type==='expense').length + ' transactions';
+
+  // Savings summary
+  const totalSaved = data.goals.reduce((s,g) => s + (g.saved||0), 0);
+  const totalTarget = data.goals.reduce((s,g) => s + (g.target||0), 0);
+  const savingsPct = totalTarget > 0 ? Math.min(100, (totalSaved/totalTarget*100)) : 0;
+  const remaining = Math.max(0, totalTarget - totalSaved);
+  document.getElementById('homeTotalSavings').textContent = fmt(totalSaved);
+  document.getElementById('homeSavingsCount').textContent = `across ${data.goals.length} goal${data.goals.length!==1?'s':''}`;
+  document.getElementById('homeSavingsPct').textContent = savingsPct.toFixed(0) + '%';
+  document.getElementById('homeSavingsRemaining').textContent = remaining > 0 ? fmt(remaining) + ' to go' : data.goals.length > 0 ? '🎉 All goals reached!' : 'No goals set';
+  document.getElementById('homeSavingsBar').style.width = savingsPct + '%';
+  document.getElementById('homeSavingsBar').className = 'progress-fill' + (savingsPct >= 100 ? ' complete' : '');
 
   const nwEl = document.getElementById('nwChange');
   nwEl.innerHTML = `<div class="nw-label">THIS MONTH</div><div style="font-size:18px;color:${bal>=0?'#fff':'rgba(255,255,255,.7)'};font-family:'Instrument Serif',serif;">${bal>=0?'+':''}${fmt(bal)}</div>`;
@@ -1273,6 +1524,18 @@ let editingCatIndex = null;
 function renderSettings() {
   renderCatList('expense');
   renderCatList('income');
+  // Reflect saved profile
+  const profile = JSON.parse(localStorage.getItem('malia-profile') || '{}');
+  if (profile.font) {
+    document.querySelectorAll('.font-opt-btn').forEach(b => b.classList.remove('active-font'));
+    const btn = document.getElementById('font-' + profile.font);
+    if (btn) btn.classList.add('active-font');
+  }
+  if (profile.accent) {
+    document.querySelectorAll('.color-swatch').forEach(b => {
+      b.classList.toggle('active-swatch', b.style.background === profile.accent);
+    });
+  }
 }
 
 function renderCatList(type) {
@@ -1370,79 +1633,108 @@ function resetCategories() {
   setTxnType(txnType);
 }
 
-// ── UPDATE APP ──
-async function updateApp() {
-  const btn = document.getElementById('updateBtn');
-  const status = document.getElementById('updateStatus');
-  const versionLabel = document.getElementById('appVersionLabel');
+// ── PROFILE, FONT & THEME ──
+const FONTS = {
+  syne:       { family: "'Syne', sans-serif",          import: null },
+  fraunces:   { family: "'Fraunces', serif",            import: null },
+  instrument: { family: "'Instrument Serif', serif",    import: null },
+  mono:       { family: "'DM Mono', monospace",         import: 'https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap' }
+};
 
-  btn.disabled = true;
-  btn.textContent = '⏳ Fetching latest version...';
-  btn.style.opacity = '0.7';
-  status.style.display = 'block';
-  status.style.color = 'var(--ink3)';
-  status.textContent = 'Connecting to Claude API...';
-
-  try {
-    const prompt = `You are a code delivery assistant. Output ONLY the complete raw HTML code for the Malia personal finance app — a single self-contained HTML file with no markdown, no explanation, no code fences. 
-
-The app must include ALL of these features:
-- 6-tab navigation: Home, Transactions, Add (gold circle button), Goals, Reports, Bills, Settings
-- AED currency throughout
-- Income & expense tracking with dynamic categories (editable in Settings)
-- Savings goals with emoji picker grid, deadline, projection engine (monthly required savings, roadmap timeline, on-track status)
-- Bill reminders with mark-paid, overdue detection
-- Reports page: 6-month bar chart, donut chart by category, goals progress report, bills summary
-- Settings page: expense & income category manager (add/edit/delete with emoji), reset to defaults, Update App button (this same feature — calls Claude API at https://api.anthropic.com/v1/messages using fetch with model claude-sonnet-4-20250514, no API key in headers since it's handled by proxy)
-- All data stored in localStorage key 'malia-v1' with fields: txns, goals, bills, expCats, incCats
-- Fonts: Syne + Instrument Serif from Google Fonts
-- Color scheme: warm cream background #f5f2ec, dark header #1a1814, gold accent #c8963c
-- The update function must use fetch to POST to https://api.anthropic.com/v1/messages with this exact prompt to regenerate itself, then replace document.open/write/close with the response
-
-Output ONLY the HTML. Start with <!DOCTYPE html> and end with </html>.`;
-
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 8000,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-
-    if (!response.ok) throw new Error('API error: ' + response.status);
-
-    const result = await response.json();
-    const newCode = result.content.map(c => c.text || '').join('').trim();
-
-    if (!newCode.includes('<!DOCTYPE') && !newCode.includes('<html')) {
-      throw new Error('Invalid response received');
-    }
-
-    status.textContent = '✅ Got latest version! Backing up your data...';
-
-    // Back up all data before reload
-    const backup = localStorage.getItem('malia-v1');
-
-    status.textContent = '💾 Applying update...';
-
-    // Write new app into page
-    document.open();
-    document.write(newCode);
-    document.close();
-
-    // Restore data after page rewrites
-    if (backup) localStorage.setItem('malia-v1', backup);
-
-  } catch (err) {
-    btn.disabled = false;
-    btn.textContent = '⚡ UPDATE APP';
-    btn.style.opacity = '1';
-    status.style.color = 'var(--red)';
-    status.textContent = '❌ Update failed: ' + (err.message || 'Unknown error. Try again.');
-    console.error('Update error:', err);
+function loadProfile() {
+  const profile = JSON.parse(localStorage.getItem('malia-profile') || '{}');
+  // Name
+  const name = profile.name || 'Alags';
+  document.getElementById('profileNameDisplay').textContent = name;
+  // Update greeting
+  const greetEl = document.querySelector('.greeting');
+  if (greetEl) greetEl.innerHTML = `Welcome back, <strong>${name}</strong> 👋`;
+  // Profile pic
+  if (profile.pic) {
+    document.getElementById('profilePicDisplay').innerHTML = `<img src="${profile.pic}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>`;
   }
+  // Font
+  if (profile.font) applyFont(profile.font, false);
+  // Accent
+  if (profile.accent) applyAccent(profile.accent, profile.accentLight, false);
+}
+
+function saveProfile(updates) {
+  const profile = JSON.parse(localStorage.getItem('malia-profile') || '{}');
+  Object.assign(profile, updates);
+  localStorage.setItem('malia-profile', JSON.stringify(profile));
+}
+
+function uploadProfilePic(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const pic = e.target.result;
+    document.getElementById('profilePicDisplay').innerHTML = `<img src="${pic}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>`;
+    saveProfile({ pic });
+  };
+  reader.readAsDataURL(file);
+}
+
+function openEditNameModal() {
+  const profile = JSON.parse(localStorage.getItem('malia-profile') || '{}');
+  document.getElementById('nameInput').value = profile.name || 'Alags';
+  document.getElementById('nameOverlay').classList.add('open');
+}
+function closeEditNameModal(e) { if (!e || e.target === document.getElementById('nameOverlay')) document.getElementById('nameOverlay').classList.remove('open'); }
+function saveName() {
+  const name = document.getElementById('nameInput').value.trim() || 'Alags';
+  saveProfile({ name });
+  document.getElementById('profileNameDisplay').textContent = name;
+  const greetEl = document.querySelector('.greeting');
+  if (greetEl) greetEl.innerHTML = `Welcome back, <strong>${name}</strong> 👋`;
+  closeEditNameModal();
+}
+
+function setFont(fontKey) {
+  applyFont(fontKey, true);
+  saveProfile({ font: fontKey });
+  // Update active button
+  document.querySelectorAll('.font-opt-btn').forEach(b => b.classList.remove('active-font'));
+  const btn = document.getElementById('font-' + fontKey);
+  if (btn) btn.classList.add('active-font');
+}
+
+function applyFont(fontKey, animate) {
+  const f = FONTS[fontKey];
+  if (!f) return;
+  if (f.import) {
+    const existing = document.getElementById('extra-font-link');
+    if (!existing) {
+      const link = document.createElement('link');
+      link.id = 'extra-font-link'; link.rel = 'stylesheet'; link.href = f.import;
+      document.head.appendChild(link);
+    }
+  }
+  document.body.style.fontFamily = f.family;
+  document.querySelectorAll('input,select,button,.nav-btn,.submit-btn,.cancel-btn').forEach(el => {
+    el.style.fontFamily = f.family;
+  });
+  // Update active button
+  document.querySelectorAll('.font-opt-btn').forEach(b => b.classList.remove('active-font'));
+  const btn = document.getElementById('font-' + fontKey);
+  if (btn) btn.classList.add('active-font');
+}
+
+function setAccent(color, lightColor) {
+  applyAccent(color, lightColor, true);
+  saveProfile({ accent: color, accentLight: lightColor });
+}
+
+function applyAccent(color, lightColor, animate) {
+  document.documentElement.style.setProperty('--gold', color);
+  document.documentElement.style.setProperty('--gold-light', lightColor || color + '33');
+  // Update active swatch
+  document.querySelectorAll('.color-swatch').forEach(b => b.classList.remove('active-swatch'));
+  document.querySelectorAll('.color-swatch').forEach(b => {
+    if (b.style.background === color) b.classList.add('active-swatch');
+  });
 }
 
 // ── INIT ──
@@ -1450,6 +1742,7 @@ document.getElementById('mainFab').style.display = 'none';
 setTxnType('expense');
 const now = new Date(); viewMonth = now.getMonth(); viewYear = now.getFullYear();
 reportMonth = now.getMonth(); reportYear = now.getFullYear();
+loadProfile();
 renderHome();
 </script>
 
