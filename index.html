@@ -583,27 +583,60 @@ select.form-input option{background:#fff;}
   </div>
 </div>
 
-<!-- SMS MODAL -->
+<!-- BULK SMS MODAL -->
 <div class="overlay" id="smsOverlay" onclick="closeSmsModal(event)">
-  <div class="modal">
+  <div class="modal" style="max-height:90vh;overflow-y:auto;">
     <div class="modal-handle"></div>
-    <div class="modal-title">📲 Paste Bank SMS</div>
-    <div style="font-size:12px;color:var(--ink2);margin-bottom:14px;line-height:1.6;">Copy an SMS from ADCB or ENBD and paste it below. Malia will automatically extract the transaction details.</div>
-    <div class="form-group">
-      <label class="form-label">PASTE SMS HERE</label>
-      <textarea class="form-input" id="smsText" placeholder="e.g. Your ADCB account was debited AED 250.00 at CARREFOUR on 25/03/2026..." style="height:100px;resize:none;line-height:1.6;"></textarea>
+    <div class="modal-title">📲 Bulk SMS Parser</div>
+    <div style="background:var(--blue-light);border-radius:12px;padding:14px;margin-bottom:16px;">
+      <div style="font-size:12px;color:var(--blue);font-weight:600;margin-bottom:6px;">How to copy SMS from iPhone:</div>
+      <div style="font-size:12px;color:var(--blue);line-height:1.7;">
+        1. Open <strong>Messages</strong> → tap <strong>ADCB</strong> or <strong>ENBD</strong> chat<br/>
+        2. Long press any message → tap <strong>"Select More"</strong><br/>
+        3. Tap all messages from <strong>Apr 1, 2026</strong> onwards<br/>
+        4. Tap the <strong>Share icon ↑</strong> → <strong>Copy</strong><br/>
+        5. Come back here and paste below
+      </div>
     </div>
-    <button class="submit-btn" onclick="parseSms()">🔍 EXTRACT TRANSACTION</button>
+    <div class="form-group">
+      <label class="form-label">PASTE ALL SMS HERE</label>
+      <textarea class="form-input" id="smsText" placeholder="Paste all your ADCB/ENBD messages here. The parser will extract all transactions automatically..." style="height:140px;resize:none;line-height:1.6;font-size:12px;"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:4px;">
+      <div style="flex:1;background:var(--bg2);border-radius:10px;padding:10px;text-align:center;">
+        <div style="font-size:10px;color:var(--ink3);letter-spacing:.06em;">START DATE</div>
+        <div style="font-size:12px;font-weight:600;color:var(--ink);margin-top:3px;">1 Apr 2026</div>
+        <div style="font-size:10px;color:var(--ink3);">Messages before this are ignored</div>
+      </div>
+      <div style="flex:1;background:var(--bg2);border-radius:10px;padding:10px;text-align:center;">
+        <div style="font-size:10px;color:var(--ink3);letter-spacing:.06em;">DUPLICATES</div>
+        <div style="font-size:12px;font-weight:600;color:var(--green);margin-top:3px;">Auto-skipped ✓</div>
+        <div style="font-size:10px;color:var(--ink3);">Same amount+date skipped</div>
+      </div>
+    </div>
+    <button class="submit-btn" style="margin-top:14px;" onclick="bulkParseSms()">🔍 PARSE & PREVIEW</button>
     <button class="cancel-btn" onclick="closeSmsModal()">Cancel</button>
   </div>
 </div>
 
-<!-- SMS CONFIRM MODAL -->
+<!-- BULK SMS PREVIEW MODAL -->
+<div class="overlay" id="smsBulkPreviewOverlay">
+  <div class="modal" style="max-height:92vh;overflow-y:auto;">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📋 Review Transactions</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;" id="smsParseStats"></div>
+    <div id="smsBulkList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;max-height:50vh;overflow-y:auto;"></div>
+    <button class="submit-btn" onclick="importAllSms()">✅ IMPORT ALL SELECTED</button>
+    <button class="cancel-btn" onclick="closeBulkPreview()">Cancel</button>
+  </div>
+</div>
+
+<!-- SMS CONFIRM MODAL (used by Shortcut) -->
 <div class="overlay" id="smsConfirmOverlay" onclick="closeSmsConfirm(event)">
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title">✅ Confirm Transaction</div>
-    <div style="font-size:12px;color:var(--ink2);margin-bottom:16px;">We extracted the following — review and confirm:</div>
+    <div style="font-size:12px;color:var(--ink2);margin-bottom:16px;">Review and confirm this transaction from your bank SMS:</div>
     <div class="type-toggle" style="margin-bottom:14px;">
       <button id="smsExpBtn" class="type-btn expense-on" onclick="setSmsType('expense')">— Expense</button>
       <button id="smsIncBtn" class="type-btn off" onclick="setSmsType('income')">+ Income</button>
@@ -617,7 +650,7 @@ select.form-input option{background:#fff;}
       <select class="form-input" id="smsCategory"></select>
     </div>
     <div class="form-group">
-      <label class="form-label">NOTE</label>
+      <label class="form-label">NOTE / MERCHANT</label>
       <input class="form-input" type="text" id="smsNote"/>
     </div>
     <div class="form-group">
@@ -1485,6 +1518,275 @@ function renderBillsReport() {
     ${overdue.length>0?`<div style="padding:0 18px 14px;"><div style="background:var(--red-light);border-radius:10px;padding:12px 14px;"><div style="font-size:11px;color:var(--red);font-weight:600;margin-bottom:8px">⚠️ OVERDUE BILLS</div>${overdue.map(b=>`<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0;"><span>${b.emoji||'📄'} ${b.name}</span><span style="color:var(--red);font-weight:600">${fmt(b.amount)}</span></div>`).join('')}</div></div>`:''}`;
 }
 
+// ── SMS AUTO-CAPTURE ──
+const APP_URL = 'https://earnest-gumdrop-2763d9.netlify.app';
+const SMS_START_DATE = '2026-04-01';
+
+function copyAppLink() {
+  navigator.clipboard.writeText(APP_URL).then(() => {
+    event.target.textContent = '✓ Copied!';
+    event.target.style.background = 'var(--green)';
+    setTimeout(() => { event.target.textContent = 'Copy'; event.target.style.background = 'var(--gold)'; }, 2000);
+  });
+}
+
+function initShortcutUrl() {
+  const url = `${APP_URL}?sms={ShortcutInput}&source=shortcut`;
+  const el = document.getElementById('shortcutUrlDisplay');
+  if (el) el.textContent = url;
+}
+
+// Handle SMS from Shortcut via URL params
+function handleUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  const sms = params.get('sms');
+  if (sms) {
+    window.history.replaceState({}, '', window.location.pathname);
+    const parsed = parseSingleSms(decodeURIComponent(sms));
+    if (parsed) {
+      if (parsed.date < SMS_START_DATE) {
+        alert('Transaction is before Apr 1, 2026 — not imported.');
+        return;
+      }
+      if (isDuplicate(parsed)) {
+        alert('This transaction already exists in Malia — skipped.');
+        return;
+      }
+      showSmsConfirm(parsed);
+    } else {
+      alert('Could not read this SMS. Try pasting it manually.');
+    }
+  }
+}
+
+// ── SINGLE SMS (from Shortcut or manual paste) ──
+const CAT_KEYWORDS = {
+  'Food & Dining': /carrefour|lulu|spinneys|restaurant|cafe|coffee|mcdonald|kfc|pizza|burger|food|dining|talabat|deliveroo|zomato|starbucks|bakery|shawarma/i,
+  'Transport':     /uber|careem|taxi|petrol|fuel|enoc|adnoc|parking|salik|rta|bus|metro|transport/i,
+  'Shopping':      /mall|shop|boutique|zara|h&m|nike|adidas|amazon|noon|namshi|fashion|store|ikea|centrepoint/i,
+  'Housing':       /rent|dewa|addc|sewa|fewa|housing|villa|apartment|maintenance/i,
+  'Health':        /pharmacy|hospital|clinic|doctor|dental|medical|health|chemist|aster|nmc|boots/i,
+  'Entertainment': /cinema|netflix|spotify|itunes|playstation|game|movie|vox|reel|youtube|disney/i,
+  'Bills':         /etisalat|du|telecom|internet|phone|bill|utility|electric|water|insurance|salik/i,
+  'Education':     /school|university|college|tuition|course|education/i,
+  'Salary':        /salary|payroll|wages|monthly pay/i,
+  'Investment':    /dividend|interest|investment|profit/i,
+  'Gift':          /gift|transfer from|received from/i,
+};
+
+function autoCategorize(text, note, type) {
+  const searchIn = (text + ' ' + note).toLowerCase();
+  if (type === 'income') {
+    for (const [cat, re] of Object.entries(CAT_KEYWORDS)) {
+      if (['Salary','Investment','Gift'].includes(cat) && re.test(searchIn)) return cat;
+    }
+    return 'Other';
+  }
+  for (const [cat, re] of Object.entries(CAT_KEYWORDS)) {
+    if (re.test(searchIn)) return cat;
+  }
+  return 'Other';
+}
+
+function parseSingleSms(text) {
+  let type = 'expense';
+  if (/credit(ed)?|received|salary|deposited|refund|cashback|reversal/i.test(text)) type = 'income';
+  if (/debit(ed)?|charged|spent|paid|purchase|payment|withdrawn/i.test(text)) type = 'expense';
+
+  let amount = null;
+  for (const p of [/AED\s*([\d,]+\.?\d*)/i, /([\d,]+\.?\d*)\s*AED/i]) {
+    const m = text.match(p);
+    if (m) { amount = parseFloat(m[1].replace(/,/g,'')); break; }
+  }
+  if (!amount || amount <= 0) return null;
+
+  let note = '';
+  for (const p of [
+    /(?:at|@)\s+([A-Z][A-Z0-9\s&'\-\.]{2,30}?)(?:\s+on|\s+for|,|\.|\d|$)/i,
+    /(?:to|for)\s+([A-Z][A-Z0-9\s&'\-\.]{2,30}?)(?:\s+on|\s+ref|,|\.|\d|$)/i,
+    /merchant[:\s]+([A-Z][A-Z0-9\s&'\-\.]{2,30}?)(?:\s+on|,|\.|\d|$)/i,
+  ]) {
+    const m = text.match(p);
+    if (m) { note = m[1].trim().replace(/\s+/g,' '); break; }
+  }
+
+  let date = todayStr();
+  const datePatterns = [
+    { re: /(\d{2})[\/\-](\d{2})[\/\-](\d{4})/, fn: m => `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}` },
+    { re: /(\d{4})[\/\-](\d{2})[\/\-](\d{2})/, fn: m => `${m[1]}-${m[2]}-${m[3]}` },
+    { re: /(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{4})/i, fn: m => {
+      const mo = {jan:'01',feb:'02',mar:'03',apr:'04',may:'05',jun:'06',jul:'07',aug:'08',sep:'09',oct:'10',nov:'11',dec:'12'};
+      return `${m[3]}-${mo[m[2].toLowerCase()]}-${m[1].padStart(2,'0')}`;
+    }},
+  ];
+  for (const {re,fn} of datePatterns) {
+    const m = text.match(re);
+    if (m) { try { date = fn(m); break; } catch(e){} }
+  }
+
+  const category = autoCategorize(text, note, type);
+  return { amount, type, note, date, category };
+}
+
+function isDuplicate(parsed) {
+  return data.txns.some(t => t.amount === parsed.amount && t.date === parsed.date && t.type === parsed.type);
+}
+
+// Single SMS confirm modal (used by Shortcut)
+let smsSingleType = 'expense';
+
+function showSmsConfirm(parsed) {
+  smsSingleType = parsed.type;
+  setSmsType(parsed.type);
+  document.getElementById('smsAmount').value = parsed.amount;
+  document.getElementById('smsNote').value = parsed.note;
+  document.getElementById('smsDate').value = parsed.date;
+  // Set category
+  const sel = document.getElementById('smsCategory');
+  for (let i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].value === parsed.category || sel.options[i].text.includes(parsed.category)) {
+      sel.selectedIndex = i; break;
+    }
+  }
+  document.getElementById('smsConfirmOverlay').classList.add('open');
+}
+
+function setSmsType(t) {
+  smsSingleType = t;
+  document.getElementById('smsExpBtn').className = 'type-btn ' + (t==='expense'?'expense-on':'off');
+  document.getElementById('smsIncBtn').className = 'type-btn ' + (t==='income'?'income-on':'off');
+  const sel = document.getElementById('smsCategory');
+  const cats = t==='expense' ? getExpCats() : getIncCats();
+  sel.innerHTML = cats.map(c => {
+    const parts = c.split('|');
+    const name = parts.length > 1 ? parts[1] : parts[0];
+    return `<option value="${name}">${parts.length>1?parts[0]+' ':''}${name}</option>`;
+  }).join('');
+}
+
+function confirmSmsTransaction() {
+  const amt = parseFloat(document.getElementById('smsAmount').value);
+  if (!amt || amt <= 0) return;
+  data.txns.push({
+    id: Date.now(), type: smsSingleType, amount: amt,
+    category: document.getElementById('smsCategory').value,
+    note: document.getElementById('smsNote').value.trim(),
+    date: document.getElementById('smsDate').value || todayStr()
+  });
+  save();
+  document.getElementById('smsConfirmOverlay').classList.remove('open');
+  renderHome();
+  alert('✅ Transaction saved!');
+}
+
+function closeSmsConfirm(e) {
+  if (!e || e.target === document.getElementById('smsConfirmOverlay'))
+    document.getElementById('smsConfirmOverlay').classList.remove('open');
+}
+
+// ── BULK SMS PASTE ──
+let parsedBulkTxns = [];
+
+function openSmsModal() {
+  document.getElementById('smsText').value = '';
+  document.getElementById('smsOverlay').classList.add('open');
+}
+function closeSmsModal(e) {
+  if (!e || e.target === document.getElementById('smsOverlay'))
+    document.getElementById('smsOverlay').classList.remove('open');
+}
+function closeBulkPreview() {
+  document.getElementById('smsBulkPreviewOverlay').classList.remove('open');
+}
+
+function splitMessages(raw) {
+  // Try splitting by blank lines first
+  const blocks = raw.split(/\n{2,}/);
+  if (blocks.length > 1) return blocks.map(b => b.replace(/\n/g,' ').trim()).filter(b => b.length > 20);
+  // Fallback: split on known SMS start patterns
+  return raw.split(/(?=(?:Dear|Your ADCB|Your ENBD|ADCB:|ENBD:))/i)
+    .map(b => b.replace(/\n/g,' ').trim()).filter(b => b.length > 20);
+}
+
+function bulkParseSms() {
+  const raw = document.getElementById('smsText').value.trim();
+  if (!raw) return;
+  closeSmsModal();
+
+  const messages = splitMessages(raw);
+  parsedBulkTxns = [];
+  let skippedDate = 0, skippedDup = 0, failed = 0;
+
+  for (const msg of messages) {
+    const parsed = parseSingleSms(msg);
+    if (!parsed) { failed++; continue; }
+    if (parsed.date < SMS_START_DATE) { skippedDate++; continue; }
+    if (isDuplicate(parsed)) { skippedDup++; continue; }
+    parsedBulkTxns.push({ ...parsed, selected: true, uid: Math.random() });
+  }
+
+  if (parsedBulkTxns.length === 0) {
+    alert(`No new transactions found after Apr 1, 2026.\n\n• ${skippedDate} before Apr 1\n• ${skippedDup} already in app\n• ${failed} unreadable`);
+    return;
+  }
+
+  renderBulkPreview(skippedDate, skippedDup, failed);
+  document.getElementById('smsBulkPreviewOverlay').classList.add('open');
+}
+
+function toggleSmsRow(i, checked) {
+  parsedBulkTxns[i].selected = checked;
+  const row = document.getElementById('sms-row-'+i);
+  if (row) {
+    row.style.background = checked ? 'var(--card)' : 'var(--bg2)';
+    row.style.borderColor = checked ? 'var(--gold)' : 'var(--border)';
+  }
+}
+
+function renderBulkPreview(skippedDate, skippedDup, failed) {
+  document.getElementById('smsParseStats').innerHTML = `
+    <div style="flex:1;background:var(--green-light);border-radius:10px;padding:10px;text-align:center;">
+      <div style="font-size:20px;font-family:'Instrument Serif',serif;color:var(--green)">${parsedBulkTxns.length}</div>
+      <div style="font-size:10px;color:var(--green);letter-spacing:.04em">FOUND</div>
+    </div>
+    <div style="flex:1;background:var(--bg2);border-radius:10px;padding:10px;text-align:center;">
+      <div style="font-size:20px;font-family:'Instrument Serif',serif;color:var(--ink2)">${skippedDup}</div>
+      <div style="font-size:10px;color:var(--ink3);letter-spacing:.04em">DUPES</div>
+    </div>
+    <div style="flex:1;background:var(--bg2);border-radius:10px;padding:10px;text-align:center;">
+      <div style="font-size:20px;font-family:'Instrument Serif',serif;color:var(--ink2)">${skippedDate}</div>
+      <div style="font-size:10px;color:var(--ink3);letter-spacing:.04em">PRE-APR</div>
+    </div>`;
+
+  document.getElementById('smsBulkList').innerHTML = parsedBulkTxns.map((t, i) => `
+    <div style="background:var(--card);border:1.5px solid var(--gold);border-radius:12px;padding:12px 14px;" id="sms-row-${i}">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input type="checkbox" checked onchange="toggleSmsRow(${i},this.checked)" style="width:18px;height:18px;accent-color:var(--gold);flex-shrink:0;cursor:pointer;"/>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;gap:6px;margin-bottom:3px;flex-wrap:wrap;">
+            <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:${t.type==='income'?'var(--green-light)':'var(--red-light)'};color:${t.type==='income'?'var(--green)':'var(--red)'};font-weight:600;">${t.type==='income'?'+ Income':'− Expense'}</span>
+            <span style="font-size:10px;color:var(--ink3);">${t.category}</span>
+          </div>
+          <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${t.note||t.category}</div>
+          <div style="font-size:11px;color:var(--ink3);margin-top:2px;">${new Date(t.date+'T00:00:00').toLocaleDateString('en-AE',{day:'numeric',month:'short',year:'numeric'})}</div>
+        </div>
+        <div style="font-family:'Instrument Serif',serif;font-size:17px;color:${t.type==='income'?'var(--green)':'var(--red)'};white-space:nowrap;">${t.type==='income'?'+':'-'}AED ${t.amount.toLocaleString('en-AE',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+      </div>
+    </div>`).join('');
+}
+
+function importAllSms() {
+  const toImport = parsedBulkTxns.filter(t => t.selected);
+  if (toImport.length === 0) { alert('No transactions selected.'); return; }
+  toImport.forEach(t => {
+    data.txns.push({ id: Date.now() + Math.random(), type: t.type, amount: t.amount, category: t.category, note: t.note, date: t.date });
+  });
+  save();
+  closeBulkPreview();
+  renderHome();
+  alert(`✅ ${toImport.length} transaction${toImport.length>1?'s':''} imported successfully!`);
+}
+
 // ── SETTINGS & CATEGORIES ──
 let editingCatType = null;
 let editingCatIndex = null;
@@ -1708,9 +2010,12 @@ function applyAccent(color, lightColor, animate) {
 // ── INIT ──
 document.getElementById('mainFab').style.display = 'none';
 setTxnType('expense');
+setSmsType('expense');
 const now = new Date(); viewMonth = now.getMonth(); viewYear = now.getFullYear();
 reportMonth = now.getMonth(); reportYear = now.getFullYear();
 loadProfile();
+initShortcutUrl();
+handleUrlParams();
 renderHome();
 </script>
 </body>
