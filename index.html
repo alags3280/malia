@@ -11,7 +11,7 @@
   --bg:#f7f4ee;--bg2:#efeae2;--card:#fff;
   --ink:#1a1711;--ink2:#706d65;--ink3:#b8b4ae;
   --gold:#c8881a;--gold2:#e8a832;--glight:#fdf0d5;--gglow:rgba(200,136,26,.22);
-  --green:#1a6b45;--grnl:#d2edd f;--grnl:#d2eddf;
+  --green:#1a6b45;--grnl:#d2eddf;
   --red:#b83030;--redl:#fbe8e8;
   --blue:#1a3d7c;--bluel:#dce8ff;
   --border:#e8e2d8;--border2:#f0ebe2;
@@ -64,7 +64,8 @@ body{background:var(--bg);color:var(--ink);font-family:'Plus Jakarta Sans',sans-
 
 /* STAT GRID */
 .sg{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.sc{background:var(–card);border:1px solid var(–border2);border-radius:var(–r);padding:16px;position:relative;overflow:hidden;box-shadow:var(–sh);}
+.sc{background:var(–card);border:1px solid var(–border2);border-radius:var(–r);padding:16px;position:relative;overflow:hidden;box-shadow:var(–sh);transition:transform .15s,box-shadow .15s;}
+.sc:active{transform:scale(.97);box-shadow:none;}
 .sc::after{content:’’;position:absolute;top:0;left:0;right:0;height:3px;}
 .sc.i::after{background:linear-gradient(90deg,var(–green),#30c070);}
 .sc.e::after{background:linear-gradient(90deg,var(–red),#e85050);}
@@ -260,8 +261,8 @@ select.fi option{background:#fff;}
   </div>
   <div class="sec" style="margin-top:18px;">
     <div class="sg">
-      <div class="sc i"><div class="sc-ico">💰</div><div class="sc-lbl">INCOME</div><div class="sc-val" id="hInc">AED 0</div><div class="sc-cnt" id="hIncN">0 txns</div></div>
-      <div class="sc e"><div class="sc-ico">📤</div><div class="sc-lbl">EXPENSES</div><div class="sc-val" id="hExp">AED 0</div><div class="sc-cnt" id="hExpN">0 txns</div></div>
+      <div class="sc i" onclick="openTxnMod('i')" style="cursor:pointer;"><div class="sc-ico">💰</div><div class="sc-lbl">INCOME</div><div class="sc-val" id="hInc">AED 0</div><div class="sc-cnt" id="hIncN">0 txns</div></div>
+      <div class="sc e" onclick="openTxnMod('e')" style="cursor:pointer;"><div class="sc-ico">📤</div><div class="sc-lbl">EXPENSES</div><div class="sc-val" id="hExp">AED 0</div><div class="sc-cnt" id="hExpN">0 txns</div></div>
     </div>
     <div class="sw">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;">
@@ -409,7 +410,7 @@ select.fi option{background:#fff;}
 <nav class="nav">
   <button class="nb on" onclick="showPg('home')" id="nav-home"><div class="nbi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>Home</button>
   <button class="nb" onclick="showPg('transactions')" id="nav-transactions"><div class="nbi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>Txns</button>
-  <button class="nadd" onclick="openTxnMod()"><div class="naddi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><span class="nadd-lbl">Add</span></button>
+  <button class="nb" onclick="showPg('savings')" id="nav-savings"><div class="nbi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><path d="M12 6v6l4 2"/></svg></div>Goals</button>
   <button class="nb" onclick="showPg('reports')" id="nav-reports"><div class="nbi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>Reports</button>
   <button class="nb" onclick="showPg('settings')" id="nav-settings"><div class="nbi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>Settings</button>
 </nav>
@@ -545,7 +546,7 @@ document.querySelectorAll(’.pg’).forEach(x=>x.classList.remove(‘on’));
 document.querySelectorAll(’.nb’).forEach(x=>x.classList.remove(‘on’));
 document.getElementById(‘pg-’+p).classList.add(‘on’);
 const nb=document.getElementById(‘nav-’+p);if(nb)nb.classList.add(‘on’);
-document.getElementById(‘mainFab’).style.display=[‘savings’,‘bills’].includes(p)?‘flex’:‘none’;
+document.getElementById(‘mainFab’).style.display=[‘bills’].includes(p)?‘flex’:‘none’;
 ({home:renderHome,transactions:renderTxns,savings:renderSav,reports:renderRpt,bills:renderBills,settings:renderSettings}[p]||function(){})();
 }
 function hFab(){if(curPg===‘savings’)openGoalMod();else if(curPg===‘bills’)openBillMod();}
@@ -650,18 +651,154 @@ el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items
 // ── SAVINGS ──
 let editGId=null,addGId=null;
 function renderSav(){document.getElementById(‘goalsList’).innerHTML=D.goals.length?D.goals.map(g=>goalHTML(g)).join(’’):’<div class="empty"><div class="eico">🎯</div><div class="etxt">No goals yet. Tap + to add one.</div></div>’;}
-function goalMini(g){const p=Math.min(100,g.target>0?(g.saved/g.target*100):0);return`<div style="padding:13px 16px;border-bottom:1px solid var(--border2);"><div style="display:flex;align-items:center;gap:9px;margin-bottom:7px;"><span style="font-size:19px;">${g.emoji||'🎯'}</span><span style="font-size:13px;font-weight:700;flex:1;">${g.name}</span><span style="font-family:'Fraunces',serif;font-size:15px;color:var(--gold);">${fmt(g.saved)}</span></div><div class="pb"><div class="pf ${p>=100?'done':''}" style="width:${p}%;"></div></div><div class="pct-lbl">${p.toFixed(0)}% of ${fmt(g.target)}</div></div>`;}
+
+const p=Math.min(100,g.target>0?(g.saved/g.target*100):0);
+const rem=Math.max(0,g.target-g.saved);
+// bar chart: saved vs remaining
+return`<div style="padding:13px 16px;border-bottom:1px solid var(--border2);cursor:pointer;" onclick="showPg('savings')" >
+<div style="display:flex;align-items:center;gap:9px;margin-bottom:8px;">
+<span style="font-size:19px;">${g.emoji||‘🎯’}</span>
+<span style="font-size:13px;font-weight:700;flex:1;">${g.name}</span>
+<span style="font-family:'Fraunces',serif;font-size:13px;color:var(--gold);">${p.toFixed(0)}%</span>
+</div>
+<div style="display:flex;gap:3px;height:10px;border-radius:5px;overflow:hidden;margin-bottom:5px;">
+<div style="width:${p}%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:5px 0 0 5px;transition:width .5s;min-width:${p>0?'6px':'0'};"></div>
+<div style="flex:1;background:var(--bg2);border-radius:0 5px 5px 0;"></div>
+</div>
+<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink3);">
+<span style="color:var(--gold);font-weight:700;">${fmt(g.saved)} saved</span>
+<span>${fmt(rem)} to go</span>
+</div>
+
+  </div>`;}
+
+function goalMini(g){
+const p=Math.min(100,g.target>0?(g.saved/g.target*100):0);
+const rem=Math.max(0,g.target-g.saved);
+return`<div style="padding:13px 16px;border-bottom:1px solid var(--border2);cursor:pointer;" onclick="showPg('savings')">
+<div style="display:flex;align-items:center;gap:9px;margin-bottom:8px;">
+<span style="font-size:19px;">${g.emoji||‘🎯’}</span>
+<span style="font-size:13px;font-weight:700;flex:1;">${g.name}</span>
+<span style="font-family:'Fraunces',serif;font-size:13px;color:var(--gold);">${p.toFixed(0)}%</span>
+</div>
+<div style="display:flex;gap:3px;height:10px;border-radius:5px;overflow:hidden;margin-bottom:5px;">
+<div style="width:${p}%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:5px 0 0 5px;transition:width .5s;min-width:${p>0?'6px':'0'};"></div>
+<div style="flex:1;background:var(--bg2);border-radius:0 5px 5px 0;"></div>
+</div>
+<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink3);">
+<span style="color:var(--gold);font-weight:700;">${fmt(g.saved)} saved</span>
+<span>${fmt(rem)} to go</span>
+</div>
+
+  </div>`;}
 function goalHTML(g){
-const p=Math.min(100,g.target>0?(g.saved/g.target*100):0),rem=Math.max(0,g.target-g.saved);
+  const p=Math.min(100,g.target>0?(g.saved/g.target*100):0),rem=Math.max(0,g.target-g.saved);
+  const now=new Date();
+
+// ── PROJECTION ENGINE ──
 let proj=’’;
 if(g.deadline&&rem>0){
-const now=new Date();const[dy,dm]=g.deadline.split(’-’).map(Number);const mL=(dy-now.getFullYear())*12+(dm-1-now.getMonth());
-if(mL<=0){proj=`<div class="proj late"><div style="font-size:11px;color:var(--red);font-weight:700;margin-bottom:3px;">⚠️ Deadline Passed</div><div style="font-size:11px;color:var(--red);">Still need ${fmt(rem)}.</div></div>`;}
-else{const mN=rem/mL,mA=Math.max(1,Math.round((now-new Date(g.id))/(1000*60*60*24*30))),mAvg=g.saved/mA,onT=mAvg>=mN,sh=Math.max(0,g.target-(g.saved+mAvg*mL));
-proj=`<div class="proj ${onT?'ok':'behind'}"><div style="display:flex;align-items:center;gap:7px;margin-bottom:9px;"><span style="font-size:17px;">${onT?'✅':'⚡'}</span><span style="font-size:12px;font-weight:700;color:${onT?'var(--green)':'var(--gold)'};">${onT?'On Track!':'Needs Attention'}</span><span style="margin-left:auto;font-size:10px;color:var(--ink2);">${mL}mo left</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:${!onT&&sh>0?'9':'0'}px;"><div class="pstat"><div style="font-family:'Fraunces',serif;font-size:17px;color:${onT?'var(--green)':'var(--red)'};">${fmt(mN)}</div><div style="font-size:9px;font-weight:700;color:var(--ink2);margin-top:2px;">NEEDED/MO</div></div><div class="pstat"><div style="font-family:'Fraunces',serif;font-size:17px;">${fmt(mAvg)}</div><div style="font-size:9px;font-weight:700;color:var(--ink2);margin-top:2px;">CURRENT AVG</div></div></div>${!onT&&sh>0?`<div style="background:rgba(184,48,48,.1);border-radius:9px;padding:9px;font-size:11px;color:var(--red);">Save <strong>${fmt(mN-mAvg)}</strong> more/month to avoid a <strong>${fmt(sh)}</strong> shortfall.</div>`:onT?`<div style="background:rgba(26,107,69,.1);border-radius:9px;padding:9px;font-size:11px;color:var(--green);">Keep saving ${fmt(mN)}/month to hit your goal! 🎉</div>`:''}</div>`;}
-}else if(!g.deadline&&rem>0)proj=`<div style="background:var(--bg2);border-radius:11px;padding:11px;font-size:11px;color:var(--ink2);margin-bottom:12px;">💡 Set a deadline to see your savings projection.</div>`;
-return`<div class="gr"><div class="gr-hdr"><div class="gr-emo">${g.emoji||'🎯'}</div><div class="gr-info"><div class="gr-name">${g.name}</div><div class="gr-tgt">Target: ${fmt(g.target)}${g.deadline?' · Due '+MOS[parseInt(g.deadline.split('-')[1])-1]+' '+g.deadline.split('-')[0]:''}</div><div class="gr-saved">${fmt(g.saved)} saved</div><div class="gr-btns"><button class="gb gb-add" onclick="openAddGMod(${g.id})">+ Add</button><button class="gb gb-edit" onclick="openEditGMod(${g.id})">✏️ Edit</button><button class="gb gb-del" onclick="delGoal(${g.id})">Delete</button></div></div></div><div class="pb"><div class="pf ${p>=100?'done':''}" style="width:${p}%;"></div></div><div class="pct-lbl" style="margin-bottom:${proj?'12px':'0'}">${p.toFixed(0)}% · ${fmt(rem)} remaining${p>=100?' · 🎉':''}</div>${proj}</div>`;
+const[dy,dm]=g.deadline.split(’-’).map(Number);
+const mLeft=(dy-now.getFullYear())*12+(dm-1-now.getMonth());
+if(mLeft<=0){
+proj=`<div class="proj late" style="margin-bottom:12px;"> <div style="font-size:11px;color:var(--red);font-weight:700;margin-bottom:3px;">⚠️ Deadline Passed</div> <div style="font-size:11px;color:var(--red);">Still need ${fmt(rem)} to reach this goal.</div> </div>`;
+} else {
+const mNeed=rem/mLeft;
+const mAge=Math.max(1,Math.round((now-new Date(g.id))/(1000*60*60*24*30)));
+const mAvg=g.saved/mAge;
+const onT=mAvg>=mNeed;
+// If behind, calculate which month goal will actually be reached at current pace
+let reachHTML=’’;
+if(!onT&&mAvg>0){
+const moToReach=Math.ceil(rem/mAvg);
+const reachDate=new Date(now.getFullYear(),now.getMonth()+moToReach,1);
+const reachStr=MOS[reachDate.getMonth()]+’ ’+reachDate.getFullYear();
+const moLate=moToReach-mLeft;
+reachHTML=`<div style="background:rgba(184,48,48,.08);border-radius:9px;padding:9px;font-size:11px;color:var(--red);margin-top:8px;"> At current pace you'll reach this goal in <strong>${reachStr}</strong> — <strong>${moLate} month${moLate!==1?'s':''} late</strong>. Save <strong>${fmt(mNeed-mAvg)}</strong> more/month to hit your deadline. </div>`;
+} else if(onT){
+reachHTML=`<div style="background:rgba(26,107,69,.08);border-radius:9px;padding:9px;font-size:11px;color:var(--green);margin-top:8px;"> 🎉 You're on track! Keep saving ${fmt(mNeed)}/month to reach your goal by <strong>${MOS[dm-1]} ${dy}</strong>. </div>`;
 }
+
+```
+  // Month-by-month mini roadmap (next 5 months)
+  const roadmap=[];
+  for(let i=1;i<=Math.min(mLeft,5);i++){
+    const d=new Date(now.getFullYear(),now.getMonth()+i,1);
+    const projected=Math.min(g.target,g.saved+mNeed*i);
+    const pct=(projected/g.target*100).toFixed(0);
+    roadmap.push({lbl:MOS[d.getMonth()].slice(0,3)+' '+String(d.getFullYear()).slice(2),amt:projected,pct,isLast:i===mLeft&&mLeft<=5});
+  }
+
+  proj=`<div class="proj ${onT?'ok':'behind'}" style="margin-bottom:12px;">
+    <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;">
+      <span style="font-size:17px;">${onT?'✅':'⚡'}</span>
+      <span style="font-size:12px;font-weight:700;color:${onT?'var(--green)':'var(--gold)'};">${onT?'On Track!':'Needs Attention'}</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--ink2);">${mLeft} month${mLeft!==1?'s':''} left</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+      <div class="pstat">
+        <div style="font-family:'Fraunces',serif;font-size:17px;color:${onT?'var(--green)':'var(--red)'};">${fmt(mNeed)}</div>
+        <div style="font-size:9px;font-weight:700;color:var(--ink2);margin-top:2px;">NEEDED/MONTH</div>
+      </div>
+      <div class="pstat">
+        <div style="font-family:'Fraunces',serif;font-size:17px;">${fmt(mAvg)}</div>
+        <div style="font-size:9px;font-weight:700;color:var(--ink2);margin-top:2px;">YOUR AVG/MONTH</div>
+      </div>
+    </div>
+    ${reachHTML}
+    ${roadmap.length>0?`
+    <div style="margin-top:10px;">
+      <div style="font-size:9px;font-weight:700;color:var(--ink2);letter-spacing:.08em;margin-bottom:8px;">MONTHLY ROADMAP</div>
+      ${roadmap.map(r=>`
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <div style="width:44px;font-size:10px;font-weight:${r.isLast?'700':'500'};color:${r.isLast?'var(--gold)':'var(--ink2)'};">${r.lbl}</div>
+          <div style="flex:1;height:7px;background:var(--bg2);border-radius:4px;overflow:hidden;">
+            <div style="height:100%;width:${r.pct}%;border-radius:4px;background:${r.isLast?'linear-gradient(90deg,var(--gold),var(--gold2))':'linear-gradient(90deg,var(--green),#30c070)'};transition:width .5s;"></div>
+          </div>
+          <div style="width:30px;font-size:10px;font-weight:700;color:var(--ink2);text-align:right;">${r.pct}%</div>
+          <div style="width:72px;font-size:10px;font-family:'Fraunces',serif;color:${r.isLast?'var(--gold)':'var(--ink)'};text-align:right;">${fmt(r.amt)}</div>
+        </div>`).join('')}
+      ${mLeft>5?`<div style="font-size:10px;color:var(--ink3);text-align:center;padding-top:3px;">+${mLeft-5} more months to go</div>`:''}
+    </div>`:''}
+  </div>`;
+}
+```
+
+} else if(!g.deadline&&rem>0){
+proj=`<div style="background:var(--bg2);border-radius:11px;padding:11px;font-size:11px;color:var(--ink2);margin-bottom:12px;">💡 Set a deadline when editing this goal to see your monthly savings roadmap.</div>`;
+}
+
+// Bar chart: saved vs remaining visual
+const barChart=`<div style="margin-bottom:10px;">
+<div style="display:flex;gap:3px;height:12px;border-radius:6px;overflow:hidden;">
+<div style="width:${p}%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:6px 0 0 6px;transition:width .5s;min-width:${p>0?'8px':'0'};"></div>
+<div style="flex:1;background:var(--bg2);border-radius:0 6px 6px 0;"></div>
+</div>
+<div style="display:flex;justify-content:space-between;margin-top:5px;font-size:10px;">
+<span style="color:var(--gold);font-weight:700;">${fmt(g.saved)} saved (${p.toFixed(0)}%)</span>
+<span style="color:var(--ink3);">${fmt(rem)} remaining</span>
+</div>
+
+  </div>`;
+
+return`<div class="gr">
+<div class="gr-hdr">
+<div class="gr-emo">${g.emoji||‘🎯’}</div>
+<div class="gr-info">
+<div class="gr-name">${g.name}</div>
+<div class="gr-tgt">Target: ${fmt(g.target)}${g.deadline?’ · Due ‘+MOS[parseInt(g.deadline.split(’-’)[1])-1]+’ ‘+g.deadline.split(’-’)[0]:’’}</div>
+<div class="gr-saved">${fmt(g.saved)} saved</div>
+<div class="gr-btns">
+<button class="gb gb-add" onclick="openAddGMod(${g.id})">+ Add</button>
+<button class="gb gb-edit" onclick="openEditGMod(${g.id})">✏️ Edit</button>
+<button class="gb gb-del" onclick="delGoal(${g.id})">Delete</button>
+</div>
+</div>
+</div>
+${barChart}
+${proj}
+
+  </div>`;}
 function delGoal(id){D.goals=D.goals.filter(g=>g.id!==id);sv();renderSav();renderHome();}
 
 // ── REPORTS ──
@@ -749,7 +886,7 @@ el.innerHTML=cats.map((c,i)=>{const p=c.split(’|’),emo=p.length>1?p[0]:(CICO
 
 // ── TXN MODAL ──
 let tType=‘e’;
-function openTxnMod(){document.getElementById(‘tDate’).value=td();document.getElementById(‘tAmt’).value=’’;document.getElementById(‘tNote’).value=’’;setTT(‘e’);document.getElementById(‘txnOv’).classList.add(‘on’);}
+function openTxnMod(type){document.getElementById(‘tDate’).value=td();document.getElementById(‘tAmt’).value=’’;document.getElementById(‘tNote’).value=’’;setTT(type||‘e’);document.getElementById(‘txnOv’).classList.add(‘on’);}
 function closeTxnMod(e){if(!e||e.target===document.getElementById(‘txnOv’))document.getElementById(‘txnOv’).classList.remove(‘on’);}
 function setTT(t){tType=t;document.getElementById(‘btnE’).className=‘tb ‘+(t===‘e’?‘eon’:‘off’);document.getElementById(‘btnI’).className=‘tb ‘+(t===‘i’?‘ion’:‘off’);const sel=document.getElementById(‘tCat’);sel.innerHTML=(t===‘e’?gEC():gIC()).map(c=>{const p=c.split(’|’),n=p.length>1?p[1]:p[0];return`<option value="${n}">${p.length>1?p[0]+' ':''}${n}</option>`;}).join(’’);}
 function saveTxn(){const amt=parseFloat(document.getElementById(‘tAmt’).value);if(!amt||amt<=0)return;D.txns.push({id:Date.now(),type:tType,amount:amt,category:document.getElementById(‘tCat’).value,note:document.getElementById(‘tNote’).value.trim(),date:document.getElementById(‘tDate’).value||td()});sv();closeTxnMod();renderHome();if(curPg===‘transactions’)renderTxns();}
