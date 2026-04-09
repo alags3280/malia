@@ -47,6 +47,12 @@ nav{position:fixed;bottom:0;left:0;right:0;height:80px;background:#fff;border-to
 .bal-ico.inc{background:rgba(255,255,255,.2)}.bal-ico.exp{background:rgba(255,255,255,.14)}
 .bal-lbl2{font-size:10px;font-weight:600;color:rgba(255,255,255,.65);letter-spacing:.6px;text-transform:uppercase}
 .bal-val{font-size:15px;font-weight:700;color:#fff;margin-top:2px}
+.bal-divider{width:1px;background:rgba(255,255,255,.2);align-self:stretch;margin:0 4px}
+.bal-row2{display:flex;position:relative;z-index:1;margin-top:12px;background:rgba(255,255,255,.1);border-radius:12px;padding:10px 14px;align-items:center;gap:10px}
+.bal-sav-ico{font-size:16px}
+.bal-sav-lbl{font-size:10px;font-weight:600;color:rgba(255,255,255,.65);letter-spacing:.6px;text-transform:uppercase}
+.bal-sav-val{font-size:15px;font-weight:700;color:#fff;margin-top:1px}
+.bal-sav-pct{font-size:11px;font-weight:600;color:rgba(255,255,255,.6);margin-left:auto}
 .bal-carry{text-align:center;margin-top:10px;font-size:12px;color:var(--ink3);cursor:pointer;padding:2px 0}
 .qa-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 20px 0}
 .qa-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:17px;border-radius:16px;border:none;font-family:'Inter',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:transform .1s}
@@ -225,10 +231,20 @@ select.fi option{background:#fff}
         <div class="bal-ico inc">📈</div>
         <div><div class="bal-lbl2">Income</div><div class="bal-val">AED <span id="hInc">0.00</span></div></div>
       </div>
+      <div class="bal-divider"></div>
       <div class="bal-stat">
         <div class="bal-ico exp">📉</div>
         <div><div class="bal-lbl2">Expenses</div><div class="bal-val">AED <span id="hExp">0.00</span></div></div>
       </div>
+    </div>
+    <!-- Savings row -->
+    <div class="bal-row2" id="balSavingsRow" style="display:none;">
+      <span class="bal-sav-ico">🏦</span>
+      <div>
+        <div class="bal-sav-lbl">Saved in Goals</div>
+        <div class="bal-sav-val">AED <span id="hSavTotal">0.00</span></div>
+      </div>
+      <span class="bal-sav-pct" id="hSavPct"></span>
     </div>
   </div>
   <div class="bal-carry">+ Set opening / carry-forward balance</div>
@@ -477,6 +493,20 @@ function rHome(){
   document.getElementById('netBal').textContent=fmt(bal);
   document.getElementById('hInc').textContent=fmt(inc);
   document.getElementById('hExp').textContent=fmt(exp);
+
+  // Savings in goals — sum of all goal saved amounts
+  var totalSaved=D.goals.reduce(function(a,g){return a+(g.saved||0);},0);
+  var savRow=document.getElementById('balSavingsRow');
+  if(totalSaved>0){
+    savRow.style.display='flex';
+    document.getElementById('hSavTotal').textContent=fmt(totalSaved);
+    // Show savings as % of income
+    var savPctEl=document.getElementById('hSavPct');
+    if(inc>0){savPctEl.textContent=((totalSaved/inc)*100).toFixed(0)+'% of income saved';}
+    else{savPctEl.textContent='';}
+  } else {
+    savRow.style.display='none';
+  }
 
   // Apportionment banner
   var ab=document.getElementById('apportionBanner');
