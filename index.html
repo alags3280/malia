@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -211,6 +212,7 @@ select.fi option{background:#fff}
 <body>
 
 <!-- ══ HOME ══ -->
+
 <div id="pg-home" class="pg on">
   <div class="home-hdr">
     <div>
@@ -261,6 +263,7 @@ select.fi option{background:#fff}
   </div>
 
   <!-- Savings apportionment banner -->
+
   <div id="apportionBanner" style="display:none;"></div>
 
   <div class="sec-hdr"><div class="sec-hdr-t">Savings Goals</div><div class="sec-hdr-a" onclick="showPg('goals')">See all ›</div></div>
@@ -273,6 +276,7 @@ select.fi option{background:#fff}
 </div>
 
 <!-- ══ TRANSACTIONS ══ -->
+
 <div id="pg-transactions" class="pg">
   <div class="ph">
     <div><div class="ph-title">Transactions</div></div>
@@ -289,6 +293,7 @@ select.fi option{background:#fff}
 </div>
 
 <!-- ══ GOALS ══ -->
+
 <div id="pg-goals" class="pg">
   <div class="ph">
     <div><div class="ph-title">Savings Goals</div></div>
@@ -307,6 +312,7 @@ select.fi option{background:#fff}
 </div>
 
 <!-- ══ CATEGORIES ══ -->
+
 <div id="pg-categories" class="pg">
   <div class="ph">
     <div><div class="ph-title">Categories</div><div class="ph-sub">Manage your custom categories</div></div>
@@ -323,6 +329,7 @@ select.fi option{background:#fff}
 </div>
 
 <!-- ══ NAV ══ -->
+
 <nav>
   <button class="nb on" onclick="showPg('home')" id="nav-home">
     <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Dashboard
@@ -339,7 +346,8 @@ select.fi option{background:#fff}
 </nav>
 
 <!-- MODALS -->
-<div class="ov" id="txnOv" onclick="cMod('txnOv',event)"><div class="modal"><div class="mh"></div><div class="mt">Add Transaction</div><div class="ttog"><button id="btnE" class="tb eon" onclick="setTT('e')">− Expense</button><button id="btnI" class="tb off" onclick="setTT('i')">+ Income</button></div><div class="fg"><label class="fl">Amount (AED)</label><input class="fi" type="number" id="tAmt" placeholder="0.00" min="0" step="0.01"/></div><div class="fg"><label class="fl">Category</label><select class="fi" id="tCat"></select></div><div class="fg"><label class="fl">Note</label><input class="fi" type="text" id="tNote" placeholder="e.g. Grocery shopping"/></div><div class="fg"><label class="fl">Date</label><input class="fi" type="date" id="tDate"/></div><button class="sbtn" onclick="saveTxn()">Add Transaction</button><button class="cbtn" onclick="cMod('txnOv')">Cancel</button></div></div>
+
+<div class="ov" id="txnOv" onclick="cMod('txnOv',event)"><div class="modal"><div class="mh"></div><div class="mt" id="txnMT">Add Transaction</div><div class="ttog"><button id="btnE" class="tb eon" onclick="setTT('e')">− Expense</button><button id="btnI" class="tb off" onclick="setTT('i')">+ Income</button></div><div class="fg"><label class="fl">Amount (AED)</label><input class="fi" type="number" id="tAmt" placeholder="0.00" min="0" step="0.01"/></div><div class="fg"><label class="fl">Category</label><select class="fi" id="tCat"></select></div><div class="fg"><label class="fl">Note</label><input class="fi" type="text" id="tNote" placeholder="e.g. Grocery shopping"/></div><div class="fg"><label class="fl">Date</label><input class="fi" type="date" id="tDate"/></div><button class="sbtn" id="txnSBtn" onclick="saveTxn()">Add Transaction</button><button class="cbtn" onclick="cMod('txnOv')">Cancel</button></div></div>
 
 <div class="ov" id="goalOv" onclick="cMod('goalOv',event)"><div class="modal"><div class="mh"></div><div class="mt" id="goalMT">New Goal</div><div class="fg"><label class="fl">Emoji</label><div class="epg" id="eGrid"></div><div style="display:flex;align-items:center;gap:8px;"><div class="epv" id="ePrev">🎯</div><input class="fi" type="text" id="gEmoji" placeholder="Or type emoji" style="font-size:18px;" oninput="updEP(this.value)"/></div></div><div class="fg"><label class="fl">Goal Name</label><input class="fi" type="text" id="gName" placeholder="e.g. Emergency Fund"/></div><div class="fg"><label class="fl">Target (AED)</label><input class="fi" type="number" id="gTarget" placeholder="0.00" min="0"/></div><div class="fg"><label class="fl">Already Saved (AED)</label><input class="fi" type="number" id="gSaved" placeholder="0.00" min="0"/></div><div class="fg"><label class="fl">Deadline</label><input class="fi" type="date" id="gDl"/></div>
 <div class="fg"><label class="fl">Monthly Savings Allocation %</label><div class="alloc-row"><input type="range" class="alloc-slider" id="gAlloc" min="0" max="100" value="0" oninput="document.getElementById('gAllocV').textContent=this.value+'%'"/><span class="alloc-val" id="gAllocV">0%</span></div><div style="font-size:11px;color:var(--ink3);margin-top:4px;">% of your monthly net savings to auto-apportion to this goal</div></div>
@@ -347,34 +355,41 @@ select.fi option{background:#fff}
 
 <div class="ov" id="addGOv" onclick="cMod('addGOv',event)"><div class="modal"><div class="mh"></div><div class="mt" id="addGT">Add Funds</div><div class="fg"><label class="fl">Amount (AED)</label><input class="fi" type="number" id="addGAmt" placeholder="0.00" min="0"/></div><button class="sbtn" onclick="confirmAddG()">Add Funds</button><button class="cbtn" onclick="cMod('addGOv')">Cancel</button></div></div>
 
+<div class="ov" id="editSavedOv" onclick="cMod('editSavedOv',event)"><div class="modal"><div class="mh"></div><div class="mt">Edit Saved Amount</div><div style="background:var(--aml);border-radius:12px;padding:12px;margin-bottom:14px;font-size:12px;color:#E65100;font-weight:500;">You can directly correct the saved balance for this goal.</div><div class="fg"><label class="fl">Saved Amount (AED)</label><input class="fi" type="number" id="editSavedAmt" placeholder="0.00" min="0" step="0.01"/></div><button class="sbtn" onclick="confirmEditSaved()">Save</button><button class="cbtn" onclick="cMod('editSavedOv')">Cancel</button></div></div>
+
 <!-- Allocation & Priority Modal -->
+
 <div class="ov" id="allocOv" onclick="cMod('allocOv',event)">
   <div class="modal" style="max-height:92vh;overflow-y:auto;">
     <div class="mh"></div>
     <div class="mt">Savings Allocation & Priority</div>
     <div class="info-box">Set the priority order (1 = highest) and what % of your monthly net savings each goal receives. Total across all goals should be ≤ 100%.</div>
 
-    <!-- Global savings % -->
-    <div class="fg">
-      <label class="fl">Total % of net savings to allocate to goals</label>
-      <div class="alloc-row">
-        <input type="range" class="alloc-slider" id="globalAllocSlider" min="0" max="100" value="50" oninput="document.getElementById('globalAllocVal').textContent=this.value+'%'"/>
-        <span class="alloc-val" id="globalAllocVal">50%</span>
-      </div>
-      <div style="font-size:11px;color:var(--ink3);margin-top:4px;">e.g. 50% means half your monthly savings pot is split across goals</div>
-    </div>
+```
+<!-- Global savings % -->
+<div class="fg">
+  <label class="fl">Total % of net savings to allocate to goals</label>
+  <div class="alloc-row">
+    <input type="range" class="alloc-slider" id="globalAllocSlider" min="0" max="100" value="50" oninput="document.getElementById('globalAllocVal').textContent=this.value+'%'"/>
+    <span class="alloc-val" id="globalAllocVal">50%</span>
+  </div>
+  <div style="font-size:11px;color:var(--ink3);margin-top:4px;">e.g. 50% means half your monthly savings pot is split across goals</div>
+</div>
 
-    <div style="font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;">Goal Priority & Individual %</div>
-    <div id="priList"></div>
+<div style="font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;">Goal Priority & Individual %</div>
+<div id="priList"></div>
 
-    <div id="allocTotalWarn" style="display:none;background:var(--rdl);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px;color:var(--rd);font-weight:600;"></div>
+<div id="allocTotalWarn" style="display:none;background:var(--rdl);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px;color:var(--rd);font-weight:600;"></div>
 
-    <button class="sbtn" onclick="saveAlloc()">Save Allocation</button>
-    <button class="cbtn" onclick="cMod('allocOv')">Cancel</button>
+<button class="sbtn" onclick="saveAlloc()">Save Allocation</button>
+<button class="cbtn" onclick="cMod('allocOv')">Cancel</button>
+```
+
   </div>
 </div>
 
 <!-- Apply Alloc Confirm -->
+
 <div class="ov" id="applyAllocOv" onclick="cMod('applyAllocOv',event)">
   <div class="modal">
     <div class="mh"></div>
@@ -564,6 +579,9 @@ function rHome(){
     return '<div class="t-tile"><div class="t-tile-ico">'+getICO(t.category)+'</div>'
       +'<div class="t-tile-body"><div class="t-tile-name">'+(t.note||t.category)+'</div><div class="t-tile-cat">'+t.category+'</div></div>'
       +'<div class="t-tile-amt '+t.type+'">'+(t.type==='i'?'+':'-')+'AED '+fmt(t.amount)+'</div>'
+      +'<button style="background:none;border:none;cursor:pointer;padding:6px;flex-shrink:0;" onclick="editT('+t.id+')">'
+      +'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--vi)" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'
+      +'</button>'
       +'</div>';
   }).join(''):'<div style="background:var(--card);border-radius:var(--r);padding:24px;text-align:center;color:var(--ink3);font-size:13px;box-shadow:var(--sh);">No transactions yet.</div>';
 
@@ -689,6 +707,7 @@ function rTxns(){
       html+='<div class="t-card"><div class="t-card-ico">'+getICO(t.category)+'</div>'
         +'<div class="t-card-body"><div class="t-card-name">'+(t.note||t.category)+'</div><div class="t-card-cat">'+t.category+'</div></div>'
         +'<div class="t-card-amt '+t.type+'">'+(t.type==='i'?'+':'-')+'AED '+fmt(t.amount)+'</div>'
+        +'<button class="t-card-del" style="color:var(--vi);" onclick="editT('+t.id+')"><svg viewBox="0 0 24 24" style="stroke:var(--vi)"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>'
         +'<button class="t-card-del" onclick="delT('+t.id+')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>'
         +'</div>';
     });
@@ -696,7 +715,21 @@ function rTxns(){
   });
   document.getElementById('txnBody').innerHTML=html;
 }
-function delT(id){D.txns=D.txns.filter(function(t){return t.id!==id;});sv();rHome();rTxns();}
+function delT(id){if(!confirm('Delete this transaction?'))return;D.txns=D.txns.filter(function(t){return t.id!==id;});sv();rHome();rTxns();}
+function editT(id){
+  var t=D.txns.find(function(t){return t.id===id;});if(!t)return;
+  editTxnId=id;
+  setTT(t.type);
+  document.getElementById('tAmt').value=t.amount;
+  document.getElementById('tNote').value=t.note||'';
+  document.getElementById('tDate').value=t.date;
+  // Set category
+  var sel=document.getElementById('tCat');
+  for(var i=0;i<sel.options.length;i++){if(sel.options[i].value===t.category){sel.selectedIndex=i;break;}}
+  document.getElementById('txnMT').textContent='Edit Transaction';
+  document.getElementById('txnSBtn').textContent='Save Changes';
+  document.getElementById('txnOv').classList.add('on');
+}
 
 // ── GOALS ──
 var editGId=null,addGId=null;
@@ -733,7 +766,8 @@ function rGoals(){
       +'<div class="gc-remain-row"><span class="gc-remain">AED '+fmt(rem)+' remaining</span></div>'
       +'<div style="display:flex;gap:8px;margin-top:14px;">'
       +'<button class="gc-add" style="flex:1;" onclick="openAddGMod('+g.id+')">+ Add Funds</button>'
-      +'<button onclick="openEditGMod('+g.id+')" style="background:var(--vil);border:none;color:var(--vi);font-family:\'Inter\',sans-serif;font-size:14px;font-weight:600;padding:15px 16px;border-radius:12px;cursor:pointer;">Edit</button>'
+      +'<button onclick="openEditSavedMod('+g.id+')" style="background:#FFF3E0;border:none;color:#E65100;font-family:\'Inter\',sans-serif;font-size:14px;font-weight:600;padding:15px 16px;border-radius:12px;cursor:pointer;">✏️ Edit</button>'
+      +'<button onclick="openEditGMod('+g.id+')" style="background:var(--vil);border:none;color:var(--vi);font-family:\'Inter\',sans-serif;font-size:14px;font-weight:600;padding:15px 16px;border-radius:12px;cursor:pointer;">⚙️</button>'
       +'</div>'
       +'</div>';
   }).join('');
@@ -752,10 +786,29 @@ function rCats(){
 }
 
 // ── GOAL MODALS ──
-var tType='e';
-function openTxnMod(type){document.getElementById('tDate').value=td();document.getElementById('tAmt').value='';document.getElementById('tNote').value='';setTT(type||'e');document.getElementById('txnOv').classList.add('on');}
+var tType='e',editTxnId=null;
+function openTxnMod(type){
+  editTxnId=null;
+  document.getElementById('txnMT').textContent='Add Transaction';
+  document.getElementById('txnSBtn').textContent='Add Transaction';
+  document.getElementById('tDate').value=td();
+  document.getElementById('tAmt').value='';
+  document.getElementById('tNote').value='';
+  setTT(type||'e');
+  document.getElementById('txnOv').classList.add('on');
+}
 function setTT(t){tType=t;document.getElementById('btnE').className='tb '+(t==='e'?'eon':'off');document.getElementById('btnI').className='tb '+(t==='i'?'ion':'off');var sel=document.getElementById('tCat');sel.innerHTML=(t==='e'?D.ec:D.ic).map(function(c){var n=catName(c);return '<option value="'+n+'">'+emoLabel(c)+' '+n+'</option>';}).join('');}
-function saveTxn(){var amt=parseFloat(document.getElementById('tAmt').value);if(!amt||amt<=0)return;D.txns.push({id:Date.now(),type:tType,amount:amt,category:document.getElementById('tCat').value,note:document.getElementById('tNote').value.trim(),date:document.getElementById('tDate').value||td()});sv();cMod('txnOv');rHome();if(curPg==='transactions')rTxns();}
+function saveTxn(){
+  var amt=parseFloat(document.getElementById('tAmt').value);if(!amt||amt<=0)return;
+  var entry={type:tType,amount:amt,category:document.getElementById('tCat').value,note:document.getElementById('tNote').value.trim(),date:document.getElementById('tDate').value||td()};
+  if(editTxnId!==null){
+    var idx=D.txns.findIndex(function(t){return t.id===editTxnId;});
+    if(idx>=0){entry.id=editTxnId;D.txns[idx]=entry;}
+  } else {
+    entry.id=Date.now();D.txns.push(entry);
+  }
+  sv();cMod('txnOv');rHome();if(curPg==='transactions')rTxns();
+}
 
 function bEG(sel){document.getElementById('eGrid').innerHTML=GEM.map(function(e){return '<button onclick="sE(\''+e+'\')" class="epb'+(e===sel?' sel':'')+'" style="font-size:20px;">'+e+'</button>';}).join('');}
 function sE(e){document.getElementById('gEmoji').value=e;document.getElementById('ePrev').textContent=e;bEG(e);}
@@ -802,6 +855,8 @@ function saveGoal(){
 
 function openAddGMod(id){addGId=id;var g=D.goals.find(function(g){return g.id===id;});document.getElementById('addGT').textContent='Add Funds — '+g.name;document.getElementById('addGAmt').value='';document.getElementById('addGOv').classList.add('on');}
 function confirmAddG(){var amt=parseFloat(document.getElementById('addGAmt').value);if(!amt||amt<=0)return;var g=D.goals.find(function(g){return g.id===addGId;});if(g)g.saved+=amt;sv();cMod('addGOv');rGoals();rHome();}
+function openEditSavedMod(id){addGId=id;var g=D.goals.find(function(g){return g.id===id;});document.getElementById('editSavedAmt').value=g.saved||0;document.getElementById('editSavedOv').classList.add('on');}
+function confirmEditSaved(){var amt=parseFloat(document.getElementById('editSavedAmt').value);if(amt===undefined||amt<0||isNaN(amt))return;var g=D.goals.find(function(g){return g.id===addGId;});if(g){g.saved=Math.min(amt,g.target);}sv();cMod('editSavedOv');rGoals();rHome();}
 
 function openCatMod(type){eCT=type;eCI=null;document.getElementById('catMT').textContent='Add '+(type==='exp'?'Expense':'Income')+' Category';document.getElementById('catSBtn').textContent='Add Category';document.getElementById('catEmo').value='';document.getElementById('catNm').value='';document.getElementById('catOv').classList.add('on');}
 function openEC(type,idx){eCT=type;eCI=idx;var c=(type==='exp'?D.ec:D.ic)[idx];var p=c.split('|');document.getElementById('catMT').textContent='Edit Category';document.getElementById('catSBtn').textContent='Save Changes';document.getElementById('catEmo').value=p.length>1?p[0]:'';document.getElementById('catNm').value=p.length>1?p[1]:p[0];document.getElementById('catOv').classList.add('on');}
@@ -836,5 +891,6 @@ function importBulk(){var ti=bTxns.filter(function(t){return t.sel;});if(!ti.len
 
 setTT('e');setSmsT('e');lProf();initSmsUrl();hUrlSms();rHome();
 </script>
+
 </body>
 </html>
