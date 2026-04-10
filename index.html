@@ -224,8 +224,14 @@ select.fi option{background:#fff}
   </div>
 
   <div class="bal-card">
-    <div class="bal-lbl">Total Balance</div>
+    <div class="bal-lbl">Net Balance</div>
     <div class="bal-amt">AED <span id="netBal">0.00</span></div>
+    <!-- Virtual Balance row -->
+    <div id="balVirtualRow" style="display:none;background:rgba(0,0,0,.18);border-radius:12px;padding:10px 14px;margin-bottom:16px;position:relative;z-index:1;">
+      <div style="font-size:10px;font-weight:600;color:rgba(255,255,255,.65);letter-spacing:.6px;text-transform:uppercase;margin-bottom:3px;">Virtual Balance <span style="font-size:9px;font-weight:500;color:rgba(255,255,255,.5);">(after savings)</span></div>
+      <div style="font-size:22px;font-weight:800;color:rgba(255,255,255,.9);letter-spacing:-.3px;">AED <span id="virtualBal">0.00</span></div>
+      <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:3px;" id="virtualBalSub"></div>
+    </div>
     <div class="bal-row">
       <div class="bal-stat">
         <div class="bal-ico inc">📈</div>
@@ -237,7 +243,7 @@ select.fi option{background:#fff}
         <div><div class="bal-lbl2">Expenses</div><div class="bal-val">AED <span id="hExp">0.00</span></div></div>
       </div>
     </div>
-    <!-- Savings row -->
+    <!-- Savings in goals row -->
     <div class="bal-row2" id="balSavingsRow" style="display:none;">
       <span class="bal-sav-ico">🏦</span>
       <div>
@@ -500,12 +506,22 @@ function rHome(){
   if(totalSaved>0){
     savRow.style.display='flex';
     document.getElementById('hSavTotal').textContent=fmt(totalSaved);
-    // Show savings as % of income
     var savPctEl=document.getElementById('hSavPct');
     if(inc>0){savPctEl.textContent=((totalSaved/inc)*100).toFixed(0)+'% of income saved';}
     else{savPctEl.textContent='';}
   } else {
     savRow.style.display='none';
+  }
+
+  // Virtual balance = net balance minus total saved in goals
+  var virtualRow=document.getElementById('balVirtualRow');
+  if(totalSaved>0){
+    var virtual=bal-totalSaved;
+    virtualRow.style.display='block';
+    document.getElementById('virtualBal').textContent=fmt(Math.max(0,virtual));
+    document.getElementById('virtualBalSub').textContent='AED '+fmt(totalSaved)+' set aside in savings goals';
+  } else {
+    virtualRow.style.display='none';
   }
 
   // Apportionment banner
