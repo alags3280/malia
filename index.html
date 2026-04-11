@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -212,7 +211,6 @@ select.fi option{background:#fff}
 <body>
 
 <!-- ══ HOME ══ -->
-
 <div id="pg-home" class="pg on">
   <div class="home-hdr">
     <div>
@@ -229,10 +227,22 @@ select.fi option{background:#fff}
     <div class="bal-lbl">Net Balance</div>
     <div class="bal-amt">AED <span id="netBal">0.00</span></div>
     <!-- Virtual Balance row -->
-    <div id="balVirtualRow" style="display:none;background:rgba(0,0,0,.18);border-radius:12px;padding:10px 14px;margin-bottom:16px;position:relative;z-index:1;">
-      <div style="font-size:10px;font-weight:600;color:rgba(255,255,255,.65);letter-spacing:.6px;text-transform:uppercase;margin-bottom:3px;">Virtual Balance <span style="font-size:9px;font-weight:500;color:rgba(255,255,255,.5);">(after savings)</span></div>
-      <div style="font-size:22px;font-weight:800;color:rgba(255,255,255,.9);letter-spacing:-.3px;">AED <span id="virtualBal">0.00</span></div>
-      <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:3px;" id="virtualBalSub"></div>
+    <div id="balVirtualRow" style="display:none;background:rgba(0,0,0,.18);border-radius:12px;padding:12px 14px;margin-bottom:16px;position:relative;z-index:1;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div style="font-size:10px;font-weight:600;color:rgba(255,255,255,.65);letter-spacing:.6px;text-transform:uppercase;">Virtual Balance <span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.45);">after savings</span></div>
+        <div style="font-size:10px;font-weight:600;color:rgba(255,255,255,.5);" id="virtualBalPct"></div>
+      </div>
+      <div style="font-size:24px;font-weight:800;color:#fff;letter-spacing:-.3px;margin-bottom:6px;">AED <span id="virtualBal">0.00</span></div>
+      <!-- Mini split bar: savings vs free -->
+      <div style="height:5px;background:rgba(255,255,255,.15);border-radius:99px;overflow:hidden;margin-bottom:6px;">
+        <div id="virtualBarSav" style="height:100%;background:rgba(255,200,50,.7);border-radius:99px;transition:width .5s;float:left;"></div>
+        <div id="virtualBarFree" style="height:100%;background:rgba(255,255,255,.5);border-radius:99px;transition:width .5s;float:left;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.55);">
+        <span>🏦 Savings: <b style="color:rgba(255,200,50,.9);" id="virtualLblSav">AED 0</b></span>
+        <span>💳 Free: <b style="color:rgba(255,255,255,.8);" id="virtualLblFree">AED 0</b></span>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.45);margin-top:4px;" id="virtualBalSub"></div>
     </div>
     <div class="bal-row">
       <div class="bal-stat">
@@ -263,7 +273,6 @@ select.fi option{background:#fff}
   </div>
 
   <!-- Savings apportionment banner -->
-
   <div id="apportionBanner" style="display:none;"></div>
 
   <div class="sec-hdr"><div class="sec-hdr-t">Savings Goals</div><div class="sec-hdr-a" onclick="showPg('goals')">See all ›</div></div>
@@ -276,7 +285,6 @@ select.fi option{background:#fff}
 </div>
 
 <!-- ══ TRANSACTIONS ══ -->
-
 <div id="pg-transactions" class="pg">
   <div class="ph">
     <div><div class="ph-title">Transactions</div></div>
@@ -293,7 +301,6 @@ select.fi option{background:#fff}
 </div>
 
 <!-- ══ GOALS ══ -->
-
 <div id="pg-goals" class="pg">
   <div class="ph">
     <div><div class="ph-title">Savings Goals</div></div>
@@ -312,7 +319,6 @@ select.fi option{background:#fff}
 </div>
 
 <!-- ══ CATEGORIES ══ -->
-
 <div id="pg-categories" class="pg">
   <div class="ph">
     <div><div class="ph-title">Categories</div><div class="ph-sub">Manage your custom categories</div></div>
@@ -329,7 +335,6 @@ select.fi option{background:#fff}
 </div>
 
 <!-- ══ NAV ══ -->
-
 <nav>
   <button class="nb on" onclick="showPg('home')" id="nav-home">
     <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Dashboard
@@ -346,7 +351,6 @@ select.fi option{background:#fff}
 </nav>
 
 <!-- MODALS -->
-
 <div class="ov" id="txnOv" onclick="cMod('txnOv',event)"><div class="modal"><div class="mh"></div><div class="mt" id="txnMT">Add Transaction</div><div class="ttog"><button id="btnE" class="tb eon" onclick="setTT('e')">− Expense</button><button id="btnI" class="tb off" onclick="setTT('i')">+ Income</button></div><div class="fg"><label class="fl">Amount (AED)</label><input class="fi" type="number" id="tAmt" placeholder="0.00" min="0" step="0.01"/></div><div class="fg"><label class="fl">Category</label><select class="fi" id="tCat"></select></div><div class="fg"><label class="fl">Note</label><input class="fi" type="text" id="tNote" placeholder="e.g. Grocery shopping"/></div><div class="fg"><label class="fl">Date</label><input class="fi" type="date" id="tDate"/></div><button class="sbtn" id="txnSBtn" onclick="saveTxn()">Add Transaction</button><button class="cbtn" onclick="cMod('txnOv')">Cancel</button></div></div>
 
 <div class="ov" id="goalOv" onclick="cMod('goalOv',event)"><div class="modal"><div class="mh"></div><div class="mt" id="goalMT">New Goal</div><div class="fg"><label class="fl">Emoji</label><div class="epg" id="eGrid"></div><div style="display:flex;align-items:center;gap:8px;"><div class="epv" id="ePrev">🎯</div><input class="fi" type="text" id="gEmoji" placeholder="Or type emoji" style="font-size:18px;" oninput="updEP(this.value)"/></div></div><div class="fg"><label class="fl">Goal Name</label><input class="fi" type="text" id="gName" placeholder="e.g. Emergency Fund"/></div><div class="fg"><label class="fl">Target (AED)</label><input class="fi" type="number" id="gTarget" placeholder="0.00" min="0"/></div><div class="fg"><label class="fl">Already Saved (AED)</label><input class="fi" type="number" id="gSaved" placeholder="0.00" min="0"/></div><div class="fg"><label class="fl">Deadline</label><input class="fi" type="date" id="gDl"/></div>
@@ -358,38 +362,33 @@ select.fi option{background:#fff}
 <div class="ov" id="editSavedOv" onclick="cMod('editSavedOv',event)"><div class="modal"><div class="mh"></div><div class="mt">Edit Saved Amount</div><div style="background:var(--aml);border-radius:12px;padding:12px;margin-bottom:14px;font-size:12px;color:#E65100;font-weight:500;">You can directly correct the saved balance for this goal.</div><div class="fg"><label class="fl">Saved Amount (AED)</label><input class="fi" type="number" id="editSavedAmt" placeholder="0.00" min="0" step="0.01"/></div><button class="sbtn" onclick="confirmEditSaved()">Save</button><button class="cbtn" onclick="cMod('editSavedOv')">Cancel</button></div></div>
 
 <!-- Allocation & Priority Modal -->
-
 <div class="ov" id="allocOv" onclick="cMod('allocOv',event)">
   <div class="modal" style="max-height:92vh;overflow-y:auto;">
     <div class="mh"></div>
     <div class="mt">Savings Allocation & Priority</div>
     <div class="info-box">Set the priority order (1 = highest) and what % of your monthly net savings each goal receives. Total across all goals should be ≤ 100%.</div>
 
-```
-<!-- Global savings % -->
-<div class="fg">
-  <label class="fl">Total % of net savings to allocate to goals</label>
-  <div class="alloc-row">
-    <input type="range" class="alloc-slider" id="globalAllocSlider" min="0" max="100" value="50" oninput="document.getElementById('globalAllocVal').textContent=this.value+'%'"/>
-    <span class="alloc-val" id="globalAllocVal">50%</span>
-  </div>
-  <div style="font-size:11px;color:var(--ink3);margin-top:4px;">e.g. 50% means half your monthly savings pot is split across goals</div>
-</div>
+    <!-- Global savings % -->
+    <div class="fg">
+      <label class="fl">Total % of net savings to allocate to goals</label>
+      <div class="alloc-row">
+        <input type="range" class="alloc-slider" id="globalAllocSlider" min="0" max="100" value="50" oninput="document.getElementById('globalAllocVal').textContent=this.value+'%'"/>
+        <span class="alloc-val" id="globalAllocVal">50%</span>
+      </div>
+      <div style="font-size:11px;color:var(--ink3);margin-top:4px;">e.g. 50% means half your monthly savings pot is split across goals</div>
+    </div>
 
-<div style="font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;">Goal Priority & Individual %</div>
-<div id="priList"></div>
+    <div style="font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;">Goal Priority & Individual %</div>
+    <div id="priList"></div>
 
-<div id="allocTotalWarn" style="display:none;background:var(--rdl);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px;color:var(--rd);font-weight:600;"></div>
+    <div id="allocTotalWarn" style="display:none;background:var(--rdl);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px;color:var(--rd);font-weight:600;"></div>
 
-<button class="sbtn" onclick="saveAlloc()">Save Allocation</button>
-<button class="cbtn" onclick="cMod('allocOv')">Cancel</button>
-```
-
+    <button class="sbtn" onclick="saveAlloc()">Save Allocation</button>
+    <button class="cbtn" onclick="cMod('allocOv')">Cancel</button>
   </div>
 </div>
 
 <!-- Apply Alloc Confirm -->
-
 <div class="ov" id="applyAllocOv" onclick="cMod('applyAllocOv',event)">
   <div class="modal">
     <div class="mh"></div>
@@ -515,26 +514,42 @@ function rHome(){
   document.getElementById('hInc').textContent=fmt(inc);
   document.getElementById('hExp').textContent=fmt(exp);
 
-  // Savings in goals — sum of all goal saved amounts
+  // ── SAVINGS & VIRTUAL BALANCE (always live) ──
   var totalSaved=D.goals.reduce(function(a,g){return a+(g.saved||0);},0);
+  var totalTarget=D.goals.reduce(function(a,g){return a+(g.target||0);},0);
+  var virtualBal=bal-totalSaved; // can be negative if savings exceed net
+  var savPct=inc>0?((totalSaved/inc)*100):0;
+  var goalPct=totalTarget>0?Math.min(100,(totalSaved/totalTarget)*100):0;
+
+  // Savings row inside card
   var savRow=document.getElementById('balSavingsRow');
-  if(totalSaved>0){
+  if(D.goals.length>0){
     savRow.style.display='flex';
     document.getElementById('hSavTotal').textContent=fmt(totalSaved);
-    var savPctEl=document.getElementById('hSavPct');
-    if(inc>0){savPctEl.textContent=((totalSaved/inc)*100).toFixed(0)+'% of income saved';}
-    else{savPctEl.textContent='';}
+    document.getElementById('hSavPct').textContent=savPct.toFixed(0)+'% of income · '+goalPct.toFixed(0)+'% of goals';
   } else {
     savRow.style.display='none';
   }
 
-  // Virtual balance = net balance minus total saved in goals
+  // Virtual balance row — always shows when goals exist, reflects live net
   var virtualRow=document.getElementById('balVirtualRow');
-  if(totalSaved>0){
-    var virtual=bal-totalSaved;
+  if(D.goals.length>0){
     virtualRow.style.display='block';
-    document.getElementById('virtualBal').textContent=fmt(Math.max(0,virtual));
-    document.getElementById('virtualBalSub').textContent='AED '+fmt(totalSaved)+' set aside in savings goals';
+    var dispVirtual=Math.max(0,virtualBal);
+    document.getElementById('virtualBal').textContent=fmt(dispVirtual);
+
+    // Split bar: savings % vs free %
+    var savBarPct=inc>0?Math.min(100,(totalSaved/inc)*100):0;
+    var freeBarPct=inc>0?Math.min(100,(dispVirtual/inc)*100):0;
+    // Cap combined at 100
+    if(savBarPct+freeBarPct>100){freeBarPct=100-savBarPct;}
+    document.getElementById('virtualBarSav').style.width=savBarPct.toFixed(1)+'%';
+    document.getElementById('virtualBarFree').style.width=freeBarPct.toFixed(1)+'%';
+    document.getElementById('virtualLblSav').textContent='AED '+fmt(totalSaved);
+    document.getElementById('virtualLblFree').textContent='AED '+fmt(dispVirtual);
+    document.getElementById('virtualBalPct').textContent=goalPct.toFixed(0)+'% of goals reached';
+    document.getElementById('virtualBalSub').innerHTML=
+      virtualBal<0?'⚠️ Savings exceed current net balance — consider reviewing goals':'';
   } else {
     virtualRow.style.display='none';
   }
@@ -969,6 +984,5 @@ function importBulk(){
 
 setTT('e');setSmsT('e');lProf();initSmsUrl();hUrlSms();rHome();
 </script>
-
 </body>
 </html>
