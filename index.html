@@ -408,7 +408,7 @@ select.fi option{background:#fff}
 
 <div class="ov" id="smsOv" onclick="cMod('smsOv',event)"><div class="modal" style="max-height:90vh;overflow-y:auto;"><div class="mh"></div><div class="mt">Bulk SMS Parser</div><div style="background:#E8F0FF;border-radius:12px;padding:12px;margin-bottom:14px;font-size:12px;color:#3B5BDB;line-height:1.6;"><b>How:</b> Open Messages → ADCB/ENBD → long press → Select More → copy all → paste below.</div><div class="fg"><label class="fl">Paste SMS Here</label><textarea class="fi" id="smsTxt" placeholder="Paste bank messages here..." style="height:110px;resize:none;font-size:12px;line-height:1.6;"></textarea></div><button class="sbtn" onclick="bulkParse()">Parse & Preview</button><button class="cbtn" onclick="cMod('smsOv')">Cancel</button></div></div>
 
-<div class="ov" id="bulkOv"><div class="modal" style="max-height:92vh;overflow-y:auto;"><div class="mh"></div><div class="mt">Review Transactions</div><div style="display:flex;gap:8px;margin-bottom:14px;" id="bulkStats"></div><div id="bulkList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;max-height:40vh;overflow-y:auto;"></div><button class="sbtn" onclick="importBulk()">Import Selected</button><button class="cbtn" onclick="cMod('bulkOv')">Cancel</button></div></div>
+<div class="ov" id="bulkOv"><div class="modal" style="max-height:92vh;overflow-y:auto;"><div class="mh"></div><div class="mt">Review Transactions</div><div style="display:flex;gap:8px;margin-bottom:12px;" id="bulkStats"></div><div id="bulkDupBanner"></div><div id="bulkList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;max-height:40vh;overflow-y:auto;"></div><button class="sbtn" onclick="importBulk()">Import Selected</button><button class="cbtn" onclick="cMod('bulkOv')">Cancel</button></div></div>
 
 <div class="ov" id="settingsOv" onclick="cMod('settingsOv',event)"><div class="modal" style="max-height:90vh;overflow-y:auto;"><div class="mh"></div><div class="mt">Settings</div>
 <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px;"><div id="profPic" style="width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,var(--vi),var(--vi2));display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;font-weight:700;overflow:hidden;flex-shrink:0;">A</div><div><div style="font-size:17px;font-weight:700;" id="profNameD">Alags</div><div style="display:flex;gap:6px;margin-top:6px;"><button onclick="openNameMod()" style="background:var(--vil);border:none;color:var(--vi);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer;">Edit Name</button><button onclick="document.getElementById('picIn').click()" style="background:var(--bg);border:1px solid var(--bd);color:var(--ink2);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer;">Photo</button></div><input type="file" id="picIn" accept="image/*" onchange="upPic(event)" style="display:none;"/></div></div>
@@ -885,9 +885,87 @@ function confSmsTxn(){var amt=parseFloat(document.getElementById('smsAmt').value
 var bTxns=[];
 function openSmsMod(){document.getElementById('smsTxt').value='';document.getElementById('smsOv').classList.add('on');}
 function splitMsgs(raw){var bl=raw.split(/\n{2,}/);if(bl.length>1)return bl.map(function(b){return b.replace(/\n/g,' ').trim();}).filter(function(b){return b.length>20;});return raw.split(/(?=(?:Dear|Your ADCB|Your ENBD|ADCB:|ENBD:))/i).map(function(b){return b.replace(/\n/g,' ').trim();}).filter(function(b){return b.length>20;});}
-function bulkParse(){var raw=document.getElementById('smsTxt').value.trim();if(!raw)return;cMod('smsOv');var msgs=splitMsgs(raw);bTxns=[];var skD=0,skDu=0,fail=0;msgs.forEach(function(msg){var p=pSms(msg);if(!p){fail++;return;}if(p.date<SFROM){skD++;return;}if(isDup(p)){skDu++;return;}bTxns.push({amount:p.amount,type:p.type,note:p.note,date:p.date,category:p.category,sel:true});});if(!bTxns.length){alert('No new transactions found.\n'+skD+' before Apr 1\n'+skDu+' already in app\n'+fail+' unreadable');return;}document.getElementById('bulkStats').innerHTML='<div style="flex:1;background:var(--gnl);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:#1B8A3A;">'+bTxns.length+'</div><div style="font-size:10px;font-weight:700;color:#1B8A3A;">FOUND</div></div><div style="flex:1;background:var(--bg);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--ink2);">'+skDu+'</div><div style="font-size:10px;font-weight:700;color:var(--ink3);">DUPES</div></div><div style="flex:1;background:var(--bg);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--ink2);">'+skD+'</div><div style="font-size:10px;font-weight:700;color:var(--ink3);">PRE-APR</div></div>';document.getElementById('bulkList').innerHTML=bTxns.map(function(t,i){return '<div style="background:var(--card);border:1.5px solid var(--vi);border-radius:12px;padding:12px;" id="br'+i+'"><div style="display:flex;align-items:center;gap:8px;"><input type="checkbox" checked onchange="togBR('+i+',this.checked)" style="width:16px;height:16px;accent-color:var(--vi);cursor:pointer;flex-shrink:0;"/><div style="flex:1;min-width:0;"><div style="display:flex;gap:5px;margin-bottom:2px;"><span class="pill '+(t.type==='i'?'pill-g':'pill-r')+'">'+(t.type==='i'?'+ Income':'- Expense')+'</span><span style="font-size:10px;font-weight:600;color:var(--ink3);">'+t.category+'</span></div><div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(t.note||t.category)+'</div><div style="font-size:11px;color:var(--ink3);margin-top:1px;">'+new Date(t.date+'T00:00:00').toLocaleDateString('en-AE',{day:'numeric',month:'short',year:'numeric'})+'</div></div><div style="font-size:15px;font-weight:700;color:'+(t.type==='i'?'var(--gn)':'var(--rd)')+';white-space:nowrap;">'+(t.type==='i'?'+':'-')+'AED '+fmt(t.amount)+'</div></div></div>';}).join('');document.getElementById('bulkOv').classList.add('on');}
+
+function bulkParse(){
+  var raw=document.getElementById('smsTxt').value.trim();if(!raw)return;
+  cMod('smsOv');
+  var msgs=splitMsgs(raw);bTxns=[];var skD=0,fail=0,dupCount=0;
+  msgs.forEach(function(msg){
+    var p=pSms(msg);
+    if(!p){fail++;return;}
+    if(p.date<SFROM){skD++;return;}
+    var dup=isDup(p);
+    if(dup)dupCount++;
+    // Include duplicates but mark them — unchecked by default
+    bTxns.push({amount:p.amount,type:p.type,note:p.note,date:p.date,category:p.category,sel:!dup,isDup:dup});
+  });
+  if(!bTxns.length){
+    alert('No transactions found.\n'+skD+' before Apr 1\n'+fail+' unreadable');return;
+  }
+
+  var newCount=bTxns.filter(function(t){return !t.isDup;}).length;
+
+  // Stats row
+  document.getElementById('bulkStats').innerHTML=
+    '<div style="flex:1;background:var(--gnl);border-radius:10px;padding:10px;text-align:center;">'
+    +'<div style="font-size:22px;font-weight:800;color:#1B8A3A;">'+newCount+'</div>'
+    +'<div style="font-size:10px;font-weight:700;color:#1B8A3A;">NEW</div></div>'
+    +(dupCount>0?'<div style="flex:1;background:#FFF3E0;border-radius:10px;padding:10px;text-align:center;">'
+    +'<div style="font-size:22px;font-weight:800;color:#E65100;">'+dupCount+'</div>'
+    +'<div style="font-size:10px;font-weight:700;color:#E65100;">DUPES</div></div>':'')
+    +(skD>0?'<div style="flex:1;background:var(--bg);border-radius:10px;padding:10px;text-align:center;">'
+    +'<div style="font-size:22px;font-weight:800;color:var(--ink2);">'+skD+'</div>'
+    +'<div style="font-size:10px;font-weight:700;color:var(--ink3);">PRE-APR</div></div>':'');
+
+  // Duplicate warning banner if any found
+  var dupBanner=dupCount>0
+    ?'<div style="background:#FFF3E0;border:1.5px solid #FFB74D;border-radius:12px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;">'
+    +'<span style="font-size:20px;">⚠️</span>'
+    +'<div><div style="font-size:13px;font-weight:700;color:#E65100;">'+dupCount+' duplicate'+(dupCount>1?'s':'')+' detected</div>'
+    +'<div style="font-size:11px;color:#BF360C;margin-top:2px;">These already exist in your app. They are unchecked by default — tick to import anyway.</div></div></div>'
+    :'';
+
+  document.getElementById('bulkDupBanner').innerHTML=dupBanner;
+
+  // Transaction rows
+  document.getElementById('bulkList').innerHTML=bTxns.map(function(t,i){
+    var borderColor=t.isDup?'#FFB74D':'var(--vi)';
+    var bgColor=t.isDup?'#FFFBF5':'var(--card)';
+    var dupTag=t.isDup
+      ?'<span style="background:#FFB74D;color:#7A3800;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap;">⚠️ DUPLICATE</span>'
+      :'';
+    return '<div style="background:'+bgColor+';border:1.5px solid '+borderColor+';border-radius:12px;padding:12px;" id="br'+i+'">'
+      +'<div style="display:flex;align-items:center;gap:8px;">'
+      +'<input type="checkbox" '+(t.sel?'checked':'')+' onchange="togBR('+i+',this.checked)" style="width:18px;height:18px;accent-color:var(--vi);cursor:pointer;flex-shrink:0;"/>'
+      +'<div style="flex:1;min-width:0;">'
+      +'<div style="display:flex;gap:5px;margin-bottom:3px;flex-wrap:wrap;align-items:center;">'
+      +'<span class="pill '+(t.type==='i'?'pill-g':'pill-r')+'">'+(t.type==='i'?'+ Income':'- Expense')+'</span>'
+      +'<span style="font-size:10px;font-weight:600;color:var(--ink3);">'+t.category+'</span>'
+      +dupTag
+      +'</div>'
+      +'<div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(t.note||t.category)+'</div>'
+      +'<div style="font-size:11px;color:var(--ink3);margin-top:1px;">'+new Date(t.date+'T00:00:00').toLocaleDateString('en-AE',{day:'numeric',month:'short',year:'numeric'})+'</div>'
+      +(t.isDup?'<div style="font-size:11px;color:#E65100;margin-top:3px;font-weight:600;">Already in your transactions — tick to import anyway</div>':'')
+      +'</div>'
+      +'<div style="font-size:15px;font-weight:700;color:'+(t.type==='i'?'var(--gn)':'var(--rd)')+';white-space:nowrap;">'+(t.type==='i'?'+':'-')+'AED '+fmt(t.amount)+'</div>'
+      +'</div></div>';
+  }).join('');
+
+  document.getElementById('bulkOv').classList.add('on');
+}
+
 function togBR(i,v){bTxns[i].sel=v;}
-function importBulk(){var ti=bTxns.filter(function(t){return t.sel;});if(!ti.length){alert('None selected.');return;}ti.forEach(function(t){D.txns.push({id:Date.now()+Math.random(),type:t.type,amount:t.amount,category:t.category,note:t.note,date:t.date});});sv();cMod('bulkOv');rHome();alert(ti.length+' transaction'+(ti.length>1?'s':'')+' imported!');}
+function importBulk(){
+  var ti=bTxns.filter(function(t){return t.sel;});
+  if(!ti.length){alert('No transactions selected.');return;}
+  var dupSelected=ti.filter(function(t){return t.isDup;});
+  if(dupSelected.length>0){
+    if(!confirm(dupSelected.length+' duplicate'+(dupSelected.length>1?'s':'')+' selected.\nImport them anyway?'))return;
+  }
+  ti.forEach(function(t){D.txns.push({id:Date.now()+Math.random(),type:t.type,amount:t.amount,category:t.category,note:t.note,date:t.date});});
+  sv();cMod('bulkOv');rHome();
+  alert(ti.length+' transaction'+(ti.length>1?'s':'')+' imported!'+(dupSelected.length?' ('+dupSelected.length+' duplicate'+(dupSelected.length>1?'s':'')+' included)':''));
+}
 
 setTT('e');setSmsT('e');lProf();initSmsUrl();hUrlSms();rHome();
 </script>
