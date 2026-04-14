@@ -1112,10 +1112,12 @@ function drawDonutFull(canvasId,legendId,catData){
   ctx.fillStyle='#5E3FD8';ctx.font='bold 10px Inter,sans-serif';ctx.fillText('AED '+total.toLocaleString('en-AE',{maximumFractionDigits:0}),70,80);
   if(legendEl){
     legendEl.innerHTML=entries.slice(0,6).map(function(e,i){
-      return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">'
-        +'<span style="width:10px;height:10px;border-radius:3px;background:'+CHART_COLORS[i%CHART_COLORS.length]+';flex-shrink:0;display:inline-block;"></span>'
-        +'<span style="flex:1;font-size:11px;color:#636366;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+e[0]+'</span>'
-        +'<span style="font-size:11px;font-weight:700;">'+(e[1]/total*100).toFixed(0)+'%</span>'
+      return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">'
+        +'<span style="width:10px;height:10px;border-radius:3px;background:'+CHART_COLORS[i%CHART_COLORS.length]+';flex-shrink:0;display:inline-block;margin-top:2px;"></span>'
+        +'<div style="flex:1;min-width:0;">'
+        +'<div style="font-size:12px;color:#1C1C1E;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+e[0]+'</div>'
+        +'<div style="font-size:11px;color:#636366;margin-top:1px;">AED '+e[1].toLocaleString('en-AE',{minimumFractionDigits:2,maximumFractionDigits:2})+' <span style="color:'+CHART_COLORS[i%CHART_COLORS.length]+';font-weight:700;">('+((e[1]/total)*100).toFixed(0)+'%)</span></div>'
+        +'</div>'
         +'</div>';
     }).join('');
   }
