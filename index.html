@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -211,6 +212,7 @@ select.fi option{background:#fff}
 <body>
 
 <!-- ══ HOME ══ -->
+
 <div id="pg-home" class="pg on">
   <div class="home-hdr">
     <div>
@@ -261,6 +263,7 @@ select.fi option{background:#fff}
   </div>
 
   <!-- Savings apportionment banner -->
+
   <div id="apportionBanner" style="display:none;"></div>
 
   <div class="sec-hdr"><div class="sec-hdr-t">Savings Goals</div><div class="sec-hdr-a" onclick="showPg('goals')">See all ›</div></div>
@@ -273,6 +276,7 @@ select.fi option{background:#fff}
 </div>
 
 <!-- ══ TRANSACTIONS ══ -->
+
 <div id="pg-transactions" class="pg">
   <div class="ph">
     <div><div class="ph-title">Transactions</div></div>
@@ -286,18 +290,19 @@ select.fi option{background:#fff}
     <button class="tf-btn" id="tf-i" onclick="setTF('i')">Income</button>
     <button class="tf-btn" id="tf-e" onclick="setTF('e')">Expenses</button>
   </div>
-  <!-- Sort row -->
-  <div style="display:flex;align-items:center;gap:8px;padding:0 20px 12px;">
-    <span style="font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.4px;">SORT:</span>
-    <button class="tf-btn on" id="ts-date" onclick="setTS('date')" style="padding:7px 14px;font-size:12px;">📅 Date</button>
-    <button class="tf-btn" id="ts-amt-hi" onclick="setTS('amt-hi')" style="padding:7px 14px;font-size:12px;">↑ Amount</button>
-    <button class="tf-btn" id="ts-amt-lo" onclick="setTS('amt-lo')" style="padding:7px 14px;font-size:12px;">↓ Amount</button>
-    <button class="tf-btn" id="ts-cat" onclick="setTS('cat')" style="padding:7px 14px;font-size:12px;">A–Z</button>
+  <!-- Sort row — changes label based on filter -->
+  <div style="display:flex;align-items:center;gap:8px;padding:0 20px 14px;flex-wrap:wrap;">
+    <span style="font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.4px;white-space:nowrap;">SORT BY:</span>
+    <button class="tf-btn on" id="ts-date" onclick="setTS('date')" style="padding:7px 12px;font-size:12px;">📅 Date</button>
+    <button class="tf-btn" id="ts-amt-hi" onclick="setTS('amt-hi')" style="padding:7px 12px;font-size:12px;">↑ Highest</button>
+    <button class="tf-btn" id="ts-amt-lo" onclick="setTS('amt-lo')" style="padding:7px 12px;font-size:12px;">↓ Lowest</button>
+    <button class="tf-btn" id="ts-cat" onclick="setTS('cat')" style="padding:7px 12px;font-size:12px;">A–Z Category</button>
   </div>
   <div id="txnBody"></div>
 </div>
 
 <!-- ══ GOALS ══ -->
+
 <div id="pg-goals" class="pg">
   <div class="ph">
     <div><div class="ph-title">Savings Goals</div></div>
@@ -315,6 +320,7 @@ select.fi option{background:#fff}
 </div>
 
 <!-- ══ CATEGORIES ══ -->
+
 <div id="pg-categories" class="pg">
   <div class="ph">
     <div><div class="ph-title">Categories</div><div class="ph-sub">Manage your custom categories</div></div>
@@ -331,6 +337,7 @@ select.fi option{background:#fff}
 </div>
 
 <!-- ══ REPORTS ══ -->
+
 <div id="pg-reports" class="pg">
   <div class="ph">
     <div><div class="ph-title">Reports</div></div>
@@ -343,12 +350,14 @@ select.fi option{background:#fff}
   </div>
 
   <!-- 6-month bar chart -->
+
   <div style="margin:0 20px 20px;background:var(--card);border-radius:var(--r);padding:16px;box-shadow:var(--sh);">
     <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:12px;">📊 6-Month Income vs Expense</div>
     <canvas id="rptBarChart"></canvas>
   </div>
 
   <!-- Expense donut -->
+
   <div style="margin:0 20px 20px;background:var(--card);border-radius:var(--r);padding:16px;box-shadow:var(--sh);">
     <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:12px;">🔴 Expenses by Category</div>
     <div style="display:flex;align-items:center;gap:16px;">
@@ -358,6 +367,7 @@ select.fi option{background:#fff}
   </div>
 
   <!-- Income donut -->
+
   <div style="margin:0 20px 20px;background:var(--card);border-radius:var(--r);padding:16px;box-shadow:var(--sh);">
     <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:12px;">🟢 Income by Category</div>
     <div style="display:flex;align-items:center;gap:16px;">
@@ -369,6 +379,7 @@ select.fi option{background:#fff}
 </div>
 
 <!-- ══ NAV ══ -->
+
 <nav>
   <button class="nb on" onclick="showPg('home')" id="nav-home">
     <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Dashboard
@@ -388,9 +399,11 @@ select.fi option{background:#fff}
 </nav>
 
 <!-- Toast notification -->
+
 <div id="toastBar" style="position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);background:#1C1C1E;color:#fff;font-size:13px;font-weight:600;padding:12px 24px;border-radius:99px;z-index:900;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.25);"></div>
 
 <!-- MODALS -->
+
 <div class="ov" id="txnOv" onclick="cMod('txnOv',event)"><div class="modal"><div class="mh"></div><div class="mt" id="txnMT">Add Transaction</div><div class="ttog"><button id="btnE" class="tb eon" onclick="setTT('e')">− Expense</button><button id="btnI" class="tb off" onclick="setTT('i')">+ Income</button></div><div class="fg"><label class="fl">Amount (AED)</label><input class="fi" type="number" id="tAmt" placeholder="0.00" min="0" step="0.01"/></div><div class="fg"><label class="fl">Category</label><select class="fi" id="tCat"></select></div><div class="fg"><label class="fl">Note</label><input class="fi" type="text" id="tNote" placeholder="e.g. Grocery shopping"/></div><div class="fg"><label class="fl">Date</label><input class="fi" type="date" id="tDate"/></div><button class="sbtn" id="txnSBtn" onclick="saveTxn()">Add Transaction</button><button class="cbtn" onclick="cMod('txnOv')">Cancel</button></div></div>
 
 <div class="ov" id="goalOv" onclick="cMod('goalOv',event)"><div class="modal"><div class="mh"></div><div class="mt" id="goalMT">New Goal</div><div class="fg"><label class="fl">Emoji</label><div class="epg" id="eGrid"></div><div style="display:flex;align-items:center;gap:8px;"><div class="epv" id="ePrev">🎯</div><input class="fi" type="text" id="gEmoji" placeholder="Or type emoji" style="font-size:18px;" oninput="updEP(this.value)"/></div></div><div class="fg"><label class="fl">Goal Name</label><input class="fi" type="text" id="gName" placeholder="e.g. Emergency Fund"/></div><div class="fg"><label class="fl">Target (AED)</label><input class="fi" type="number" id="gTarget" placeholder="0.00" min="0"/></div><div class="fg"><label class="fl">Already Saved (AED)</label><input class="fi" type="number" id="gSaved" placeholder="0.00" min="0"/></div><div class="fg"><label class="fl">Deadline</label><input class="fi" type="date" id="gDl"/></div>
@@ -402,33 +415,38 @@ select.fi option{background:#fff}
 <div class="ov" id="editSavedOv" onclick="cMod('editSavedOv',event)"><div class="modal"><div class="mh"></div><div class="mt">Edit Saved Amount</div><div style="background:var(--aml);border-radius:12px;padding:12px;margin-bottom:14px;font-size:12px;color:#E65100;font-weight:500;">You can directly correct the saved balance for this goal.</div><div class="fg"><label class="fl">Saved Amount (AED)</label><input class="fi" type="number" id="editSavedAmt" placeholder="0.00" min="0" step="0.01"/></div><button class="sbtn" onclick="confirmEditSaved()">Save</button><button class="cbtn" onclick="cMod('editSavedOv')">Cancel</button></div></div>
 
 <!-- Allocation & Priority Modal -->
+
 <div class="ov" id="allocOv" onclick="cMod('allocOv',event)">
   <div class="modal" style="max-height:92vh;overflow-y:auto;">
     <div class="mh"></div>
     <div class="mt">Savings Allocation & Priority</div>
     <div class="info-box">Set the priority order (1 = highest) and what % of your monthly net savings each goal receives. Total across all goals should be ≤ 100%.</div>
 
-    <!-- Global savings % -->
-    <div class="fg">
-      <label class="fl">Total % of net savings to allocate to goals</label>
-      <div class="alloc-row">
-        <input type="range" class="alloc-slider" id="globalAllocSlider" min="0" max="100" value="50" oninput="document.getElementById('globalAllocVal').textContent=this.value+'%'"/>
-        <span class="alloc-val" id="globalAllocVal">50%</span>
-      </div>
-      <div style="font-size:11px;color:var(--ink3);margin-top:4px;">e.g. 50% means half your monthly savings pot is split across goals</div>
-    </div>
+```
+<!-- Global savings % -->
+<div class="fg">
+  <label class="fl">Total % of net savings to allocate to goals</label>
+  <div class="alloc-row">
+    <input type="range" class="alloc-slider" id="globalAllocSlider" min="0" max="100" value="50" oninput="document.getElementById('globalAllocVal').textContent=this.value+'%'"/>
+    <span class="alloc-val" id="globalAllocVal">50%</span>
+  </div>
+  <div style="font-size:11px;color:var(--ink3);margin-top:4px;">e.g. 50% means half your monthly savings pot is split across goals</div>
+</div>
 
-    <div style="font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;">Goal Priority & Individual %</div>
-    <div id="priList"></div>
+<div style="font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;">Goal Priority & Individual %</div>
+<div id="priList"></div>
 
-    <div id="allocTotalWarn" style="display:none;background:var(--rdl);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px;color:var(--rd);font-weight:600;"></div>
+<div id="allocTotalWarn" style="display:none;background:var(--rdl);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px;color:var(--rd);font-weight:600;"></div>
 
-    <button class="sbtn" onclick="saveAlloc()">Save Allocation</button>
-    <button class="cbtn" onclick="cMod('allocOv')">Cancel</button>
+<button class="sbtn" onclick="saveAlloc()">Save Allocation</button>
+<button class="cbtn" onclick="cMod('allocOv')">Cancel</button>
+```
+
   </div>
 </div>
 
 <!-- Apply Alloc Confirm -->
+
 <div class="ov" id="applyAllocOv" onclick="cMod('applyAllocOv',event)">
   <div class="modal">
     <div class="mh"></div>
@@ -546,46 +564,35 @@ function cMod(id,e){if(!e||e.target===document.getElementById(id))document.getEl
 
 // ── HOME ──
 function rHome(){
-  var n=new Date();
-
-  // ── ALL-TIME totals (for balance card) ──
+  // ALL-TIME totals — everything on the card is all-time for consistency
   var allInc=D.txns.filter(function(t){return t.type==='i';}).reduce(function(a,t){return a+t.amount;},0);
   var allExp=D.txns.filter(function(t){return t.type==='e';}).reduce(function(a,t){return a+t.amount;},0);
-  var allBal=allInc-allExp;
+  var netBal=allInc-allExp;
 
-  // ── THIS MONTH totals (for income/expense stat tiles) ──
-  var mt=moT(n.getMonth(),n.getFullYear());
-  var inc=mt.filter(function(t){return t.type==='i';}).reduce(function(a,t){return a+t.amount;},0);
-  var exp=mt.filter(function(t){return t.type==='e';}).reduce(function(a,t){return a+t.amount;},0);
-
-  // Net balance = all-time income − expenses
-  var allNetBal=allInc-allExp;
-
-  // Virtual balance = net minus savings (the focus number)
+  // Savings from goals
   var totalSaved=D.goals.reduce(function(a,g){return a+(g.saved||0);},0);
   var totalTarget=D.goals.reduce(function(a,g){return a+(g.target||0);},0);
-  var virtualBal=allNetBal-totalSaved;
+  var availBal=netBal-totalSaved;
   var goalPct=totalTarget>0?Math.min(100,(totalSaved/totalTarget)*100):0;
 
-  // Show virtual balance as the MAIN number
-  document.getElementById('netBal').textContent=fmt(Math.max(0,virtualBal));
+  // Main balance = available (net minus savings)
+  document.getElementById('netBal').textContent=fmt(Math.max(0,availBal));
 
-  // Subtitle shows the breakdown
+  // Subtitle
   var subLine=document.getElementById('balSubLine');
   if(totalSaved>0){
-    subLine.textContent='Net AED '+fmt(allNetBal)+' − Savings AED '+fmt(totalSaved);
+    subLine.textContent='Net AED '+fmt(netBal)+' − Savings AED '+fmt(totalSaved);
   } else {
-    subLine.textContent='All-time net balance';
+    subLine.textContent='All-time: Income AED '+fmt(allInc)+' − Expenses AED '+fmt(allExp);
   }
 
-  // Income/Expense tiles = this month
-  document.getElementById('hInc').textContent=fmt(inc);
-  document.getElementById('hExp').textContent=fmt(exp);
+  // Income & Expense tiles — all-time
+  document.getElementById('hInc').textContent=fmt(allInc);
+  document.getElementById('hExp').textContent=fmt(allExp);
 
-  // Savings row inside card (now inline next to income/expense)
+  // Savings stat tile
   var savRow=document.getElementById('balSavingsRow');
-  if(savRow)savRow.style.display='none'; // hide old row — now inline
-
+  if(savRow)savRow.style.display='none';
   var savStat=document.getElementById('balSavStat');
   var savDiv=document.getElementById('balSavDivider');
   if(D.goals.length>0){
@@ -599,8 +606,12 @@ function rHome(){
     savDiv.style.display='none';
   }
 
-  var ab=document.getElementById('apportionBanner');
+  // This month for banner only
+  var n=new Date(),mt=moT(n.getMonth(),n.getFullYear());
+  var inc=mt.filter(function(t){return t.type==='i';}).reduce(function(a,t){return a+t.amount;},0);
+  var exp=mt.filter(function(t){return t.type==='e';}).reduce(function(a,t){return a+t.amount;},0);
   var monthNet=Math.max(0,inc-exp);
+  var ab=document.getElementById('apportionBanner');
   if(D.goals.length>0&&D.globalAlloc>0&&monthNet>0){
     var pot=monthNet*(D.globalAlloc/100);
     var hasAlloc=D.goals.some(function(g){return g.alloc>0;});
@@ -754,53 +765,85 @@ function confirmApplyAlloc(){
 var txnFilter='all',txnSort='date';
 function setTF(f){txnFilter=f;['all','i','e'].forEach(function(x){document.getElementById('tf-'+x).className='tf-btn'+(f===x?' on':'');});rTxns();}
 function setTS(s){txnSort=s;['date','amt-hi','amt-lo','cat'].forEach(function(x){document.getElementById('ts-'+x).className='tf-btn'+(s===x?' on':'');});rTxns();}
+
+function sortTxns(arr){
+  if(txnSort==='amt-hi')return arr.slice().sort(function(a,b){return b.amount-a.amount;});
+  if(txnSort==='amt-lo')return arr.slice().sort(function(a,b){return a.amount-b.amount;});
+  if(txnSort==='cat')return arr.slice().sort(function(a,b){return a.category.localeCompare(b.category);});
+  return arr.slice().sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+}
+
 function rTxns(){
   var all=D.txns.slice();
   var filtered=txnFilter==='all'?all:all.filter(function(t){return t.type===txnFilter;});
-
-  // Apply sort
-  if(txnSort==='date'){
-    filtered.sort(function(a,b){return new Date(b.date)-new Date(a.date);});
-  } else if(txnSort==='amt-hi'){
-    filtered.sort(function(a,b){return b.amount-a.amount;});
-  } else if(txnSort==='amt-lo'){
-    filtered.sort(function(a,b){return a.amount-b.amount;});
-  } else if(txnSort==='cat'){
-    filtered.sort(function(a,b){return a.category.localeCompare(b.category);});
+  if(!filtered.length){
+    document.getElementById('txnBody').innerHTML='<div class="empty-s"><div class="empty-s-ico">📋</div><div class="empty-s-txt">No transactions yet</div></div>';
+    return;
   }
 
-  if(!filtered.length){document.getElementById('txnBody').innerHTML='<div class="empty-s"><div class="empty-s-ico">📋</div><div class="empty-s-txt">No transactions yet</div></div>';return;}
+  var html='';
 
-  // Group by date only when sorting by date; otherwise flat list
   if(txnSort==='date'){
-    var groups={};filtered.forEach(function(t){if(!groups[t.date])groups[t.date]=[];groups[t.date].push(t);});
+    // Group by date regardless of filter
+    var sorted=sortTxns(filtered);
+    var groups={};
+    sorted.forEach(function(t){if(!groups[t.date])groups[t.date]=[];groups[t.date].push(t);});
     var dates=Object.keys(groups).sort(function(a,b){return new Date(b)-new Date(a);});
-    var html='';
     dates.forEach(function(date){
       var d=new Date(date+'T00:00:00');
       html+='<div class="t-date-hdr">'+DAYS[d.getDay()].toUpperCase()+', '+MOS3[d.getMonth()].toUpperCase()+' '+d.getDate()+'</div><div class="t-cards">';
       groups[date].forEach(function(t){html+=tCardHtml(t);});
       html+='</div><div style="height:4px"></div>';
     });
-    document.getElementById('txnBody').innerHTML=html;
   } else {
-    // Flat sorted list with category headers for A-Z sort
-    var html2='<div class="t-cards" style="padding-bottom:16px;">';
-    if(txnSort==='cat'){
-      var curCat='';
-      filtered.forEach(function(t){
-        if(t.category!==curCat){
-          curCat=t.category;
-          html2+='</div><div class="t-date-hdr">'+curCat+'</div><div class="t-cards">';
+    // Non-date sort: separate income and expense sections when showing "All"
+    if(txnFilter==='all'){
+      var incTxns=sortTxns(filtered.filter(function(t){return t.type==='i';}));
+      var expTxns=sortTxns(filtered.filter(function(t){return t.type==='e';}));
+      var incTotal=incTxns.reduce(function(a,t){return a+t.amount;},0);
+      var expTotal=expTxns.reduce(function(a,t){return a+t.amount;},0);
+
+      if(incTxns.length){
+        html+='<div class="t-date-hdr" style="color:#1B8A3A;">💰 INCOME — AED '+fmt(incTotal)+'</div>';
+        if(txnSort==='cat'){
+          var curC='';
+          incTxns.forEach(function(t){
+            if(t.category!==curC){curC=t.category;html+='<div style="padding:8px 20px 4px;font-size:11px;font-weight:700;color:var(--ink3);">'+curC+'</div>';}
+            html+='<div class="t-cards">'+tCardHtml(t)+'</div>';
+          });
+        } else {
+          html+='<div class="t-cards">'+incTxns.map(tCardHtml).join('')+'</div>';
         }
-        html2+=tCardHtml(t);
-      });
+        html+='<div style="height:12px"></div>';
+      }
+      if(expTxns.length){
+        html+='<div class="t-date-hdr" style="color:#CC2000;">💸 EXPENSES — AED '+fmt(expTotal)+'</div>';
+        if(txnSort==='cat'){
+          var curC2='';
+          expTxns.forEach(function(t){
+            if(t.category!==curC2){curC2=t.category;html+='<div style="padding:8px 20px 4px;font-size:11px;font-weight:700;color:var(--ink3);">'+curC2+'</div>';}
+            html+='<div class="t-cards">'+tCardHtml(t)+'</div>';
+          });
+        } else {
+          html+='<div class="t-cards">'+expTxns.map(tCardHtml).join('')+'</div>';
+        }
+      }
     } else {
-      filtered.forEach(function(t){html2+=tCardHtml(t);});
+      // Single type filter — just sort flat
+      var sorted2=sortTxns(filtered);
+      if(txnSort==='cat'){
+        var curC3='';
+        sorted2.forEach(function(t){
+          if(t.category!==curC3){curC3=t.category;html+='<div style="padding:8px 20px 4px;font-size:11px;font-weight:700;color:var(--ink3);">'+curC3+'</div>';}
+          html+='<div class="t-cards">'+tCardHtml(t)+'</div>';
+        });
+      } else {
+        html='<div class="t-cards">'+sorted2.map(tCardHtml).join('')+'</div>';
+      }
     }
-    html2+='</div>';
-    document.getElementById('txnBody').innerHTML=html2;
   }
+
+  document.getElementById('txnBody').innerHTML=html;
 }
 function tCardHtml(t){
   var ds=new Date(t.date+'T00:00:00').toLocaleDateString('en-AE',{day:'numeric',month:'short'});
@@ -1240,5 +1283,6 @@ function rReports(){
 }
 
 </script>
+
 </body>
 </html>
