@@ -564,29 +564,26 @@ function cMod(id,e){if(!e||e.target===document.getElementById(id))document.getEl
 
 // ── HOME ──
 function rHome(){
-  // ALL-TIME totals — everything on the card is all-time for consistency
+  // ALL-TIME totals
   var allInc=D.txns.filter(function(t){return t.type==='i';}).reduce(function(a,t){return a+t.amount;},0);
   var allExp=D.txns.filter(function(t){return t.type==='e';}).reduce(function(a,t){return a+t.amount;},0);
-  var netBal=allInc-allExp;
+  var netBal=allInc-allExp; // true net (can be any value)
 
-  // Savings from goals
+  // Savings — capped at net balance so available never goes negative
   var totalSaved=D.goals.reduce(function(a,g){return a+(g.saved||0);},0);
   var totalTarget=D.goals.reduce(function(a,g){return a+(g.target||0);},0);
-  var availBal=netBal-totalSaved;
+  var effectiveSaved=Math.min(totalSaved, Math.max(0,netBal)); // never more than net
+  var availBal=Math.max(0, netBal-effectiveSaved);
   var goalPct=totalTarget>0?Math.min(100,(totalSaved/totalTarget)*100):0;
 
-  // Main balance = available (net minus savings)
-  document.getElementById('netBal').textContent=fmt(Math.max(0,availBal));
+  // Main balance card
+  document.getElementById('netBal').textContent=fmt(availBal);
 
-  // Subtitle
+  // Subtitle — show the real net clearly
   var subLine=document.getElementById('balSubLine');
-  if(totalSaved>0){
-    subLine.textContent='Net AED '+fmt(netBal)+' − Savings AED '+fmt(totalSaved);
-  } else {
-    subLine.textContent='All-time: Income AED '+fmt(allInc)+' − Expenses AED '+fmt(allExp);
-  }
+  subLine.textContent='Net AED '+fmt(Math.max(0,netBal))+' − Savings AED '+fmt(effectiveSaved);
 
-  // Income & Expense tiles — all-time
+  // Stat tiles — all-time income & expenses
   document.getElementById('hInc').textContent=fmt(allInc);
   document.getElementById('hExp').textContent=fmt(allExp);
 
@@ -599,14 +596,14 @@ function rHome(){
     savStat.style.display='flex';
     savDiv.style.display='block';
     document.getElementById('hSavInline').textContent=fmt(totalSaved);
-    document.getElementById('hSavTotal').textContent=fmt(totalSaved);
+    if(document.getElementById('hSavTotal'))document.getElementById('hSavTotal').textContent=fmt(totalSaved);
     document.getElementById('hSavPct').textContent=goalPct.toFixed(0)+'% of goals reached';
   } else {
     savStat.style.display='none';
     savDiv.style.display='none';
   }
 
-  // This month for banner only
+  // This month for banner
   var n=new Date(),mt=moT(n.getMonth(),n.getFullYear());
   var inc=mt.filter(function(t){return t.type==='i';}).reduce(function(a,t){return a+t.amount;},0);
   var exp=mt.filter(function(t){return t.type==='e';}).reduce(function(a,t){return a+t.amount;},0);
@@ -915,9 +912,6 @@ function rGoals(){
 function delG(id){if(!confirm('Delete this goal?'))return;D.goals=D.goals.filter(function(g){return g.id!==id;});sv();rGoals();rHome();}
 
 // ── AUTO SAVINGS ALLOCATION ──
-// Called every time transactions change. Recalculates this month's net,
-// applies globalAlloc % split across goals by their alloc %, updates goal.saved.
-// Uses a per-goal "base" saved before auto-alloc so manual additions are preserved.
 function autoApplyAlloc(){
   if(!D.goals.length||!D.globalAlloc)return;
   var hasAlloc=D.goals.some(function(g){return g.alloc>0;});
@@ -930,14 +924,27 @@ function autoApplyAlloc(){
   var monthNet=Math.max(0,inc-exp);
   var pot=monthNet*(D.globalAlloc/100);
 
-  // Apply each goal's % of the pot, on top of their manual base (savedBase)
+  // All-time net — savings must never exceed this
+  var allInc=D.txns.filter(function(t){return t.type==='i';}).reduce(function(a,t){return a+t.amount;},0);
+  var allExp=D.txns.filter(function(t){return t.type==='e';}).reduce(function(a,t){return a+t.amount;},0);
+  var allNetBal=Math.max(0,allInc-allExp);
+
+  // Apply each goal's allocation from the monthly pot
   D.goals.forEach(function(g){
     if(!g.alloc)return;
     var autoAmt=pot*(g.alloc/100);
-    var base=g.savedBase||0; // manual additions preserved
+    var base=g.savedBase||0;
     var newSaved=Math.min(g.target, base+autoAmt);
-    g.saved=Math.max(g.saved||0, newSaved); // never go below what was already there
+    g.saved=Math.max(g.saved||0, newSaved);
   });
+
+  // Safety cap: if total saved across goals > all-time net, scale down proportionally
+  var totalSaved=D.goals.reduce(function(a,g){return a+(g.saved||0);},0);
+  if(totalSaved>allNetBal&&totalSaved>0){
+    var scale=allNetBal/totalSaved;
+    D.goals.forEach(function(g){g.saved=g.saved*scale;});
+  }
+
   sv();
 }
 
