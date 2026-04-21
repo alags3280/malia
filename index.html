@@ -1111,34 +1111,68 @@ function bulkParse(){
 
   document.getElementById('bulkDupBanner').innerHTML=dupBanner;
 
+  // Build category options helper
+  function catOpts(type,selected){
+    var cats=type==='i'?D.ic:D.ec;
+    var opts=cats.map(function(c){var n=catName(c);return '<option value="'+n+'"'+(n===selected?' selected':'')+'>'+emoLabel(c)+' '+n+'</option>';}).join('');
+    opts+='<option value="__new__">➕ Add new category...</option>';
+    return opts;
+  }
+
   // Transaction rows
   document.getElementById('bulkList').innerHTML=bTxns.map(function(t,i){
     var borderColor=t.isDup?'#FFB74D':'var(--vi)';
     var bgColor=t.isDup?'#FFFBF5':'var(--card)';
-    var dupTag=t.isDup
-      ?'<span style="background:#FFB74D;color:#7A3800;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap;">⚠️ DUPLICATE</span>'
-      :'';
-    return '<div style="background:'+bgColor+';border:1.5px solid '+borderColor+';border-radius:12px;padding:12px;" id="br'+i+'">'
-      +'<div style="display:flex;align-items:center;gap:8px;">'
+    var dupTag=t.isDup?'<span style="background:#FFB74D;color:#7A3800;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap;">⚠️ DUPLICATE</span>':'';
+    return '<div style="background:'+bgColor+';border:1.5px solid '+borderColor+';border-radius:12px;padding:12px;margin-bottom:2px;" id="br'+i+'">'
+      // Row 1: checkbox + type pill + dup tag
+      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">'
       +'<input type="checkbox" '+(t.sel?'checked':'')+' onchange="togBR('+i+',this.checked)" style="width:18px;height:18px;accent-color:var(--vi);cursor:pointer;flex-shrink:0;"/>'
-      +'<div style="flex:1;min-width:0;">'
-      +'<div style="display:flex;gap:5px;margin-bottom:3px;flex-wrap:wrap;align-items:center;">'
       +'<span class="pill '+(t.type==='i'?'pill-g':'pill-r')+'">'+(t.type==='i'?'+ Income':'- Expense')+'</span>'
-      +'<span style="font-size:10px;font-weight:600;color:var(--ink3);">'+t.category+'</span>'
       +dupTag
+      +'<span style="flex:1;font-size:12px;color:var(--ink3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(t.note||'')+'</span>'
+      +'<span style="font-size:11px;color:var(--ink3);">'+new Date(t.date+'T00:00:00').toLocaleDateString('en-AE',{day:'numeric',month:'short'})+'</span>'
       +'</div>'
-      +'<div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(t.note||t.category)+'</div>'
-      +'<div style="font-size:11px;color:var(--ink3);margin-top:1px;">'+new Date(t.date+'T00:00:00').toLocaleDateString('en-AE',{day:'numeric',month:'short',year:'numeric'})+'</div>'
-      +(t.isDup?'<div style="font-size:11px;color:#E65100;margin-top:3px;font-weight:600;">Already in your transactions — tick to import anyway</div>':'')
+      // Row 2: editable amount + category dropdown side by side
+      +'<div style="display:flex;gap:8px;align-items:center;">'
+      +'<div style="display:flex;align-items:center;background:var(--bg);border:1.5px solid var(--bd);border-radius:10px;padding:8px 10px;gap:4px;flex:0 0 auto;">'
+      +'<span style="font-size:11px;font-weight:700;color:var(--ink3);">AED</span>'
+      +'<input type="number" id="bamt'+i+'" value="'+t.amount+'" min="0" step="0.01" style="width:80px;border:none;background:transparent;font-size:15px;font-weight:700;color:'+(t.type==='i'?'var(--gn)':'var(--rd)')+';font-family:Inter,sans-serif;outline:none;text-align:right;" onchange="updBR('+i+')"/>'
       +'</div>'
-      +'<div style="font-size:15px;font-weight:700;color:'+(t.type==='i'?'var(--gn)':'var(--rd)')+';white-space:nowrap;">'+(t.type==='i'?'+':'-')+'AED '+fmt(t.amount)+'</div>'
-      +'</div></div>';
+      +'<select id="bcat'+i+'" onchange="chkNewCat('+i+',this)" style="flex:1;background:var(--bg);border:1.5px solid var(--bd);border-radius:10px;padding:9px 10px;font-size:13px;font-weight:600;color:var(--ink);font-family:Inter,sans-serif;outline:none;">'
+      +catOpts(t.type,t.category)
+      +'</select>'
+      +'</div>'
+      +(t.isDup?'<div style="font-size:11px;color:#E65100;margin-top:6px;font-weight:600;">⚠️ Already in your transactions — tick to import anyway</div>':'')
+      +'</div>';
   }).join('');
 
   document.getElementById('bulkOv').classList.add('on');
 }
 
 function togBR(i,v){bTxns[i].sel=v;}
+function updBR(i){var inp=document.getElementById('bamt'+i);if(inp)bTxns[i].amount=parseFloat(inp.value)||bTxns[i].amount;}
+function chkNewCat(i,sel){
+  if(sel.value==='__new__'){
+    var nm=prompt('New category name:');
+    if(!nm){sel.value=bTxns[i].category;return;}
+    var em=prompt('Emoji for category (optional):') || '📌';
+    var entry=em.trim()+'|'+nm.trim();
+    // Add to correct list
+    if(bTxns[i].type==='i')D.ic.push(entry);else D.ec.push(entry);
+    sv();
+    // Add option to this select and select it
+    var opt=document.createElement('option');
+    opt.value=nm.trim();opt.textContent=em.trim()+' '+nm.trim();
+    sel.insertBefore(opt,sel.lastChild);
+    sel.value=nm.trim();
+    bTxns[i].category=nm.trim();
+    setTT(tType); // refresh txn modal cats too
+    showToast('✅ Category added!');
+  } else {
+    bTxns[i].category=sel.value;
+  }
+}
 function importBulk(){
   var ti=bTxns.filter(function(t){return t.sel;});
   if(!ti.length){alert('No transactions selected.');return;}
@@ -1146,10 +1180,16 @@ function importBulk(){
   if(dupSelected.length>0){
     if(!confirm(dupSelected.length+' duplicate'+(dupSelected.length>1?'s':'')+' selected.\nImport them anyway?'))return;
   }
+  // Read latest edited values from DOM before importing
+  bTxns.forEach(function(t,i){
+    var amtEl=document.getElementById('bamt'+i);
+    var catEl=document.getElementById('bcat'+i);
+    if(amtEl){var v=parseFloat(amtEl.value);if(v>0)t.amount=v;}
+    if(catEl&&catEl.value&&catEl.value!=='__new__')t.category=catEl.value;
+  });
   ti.forEach(function(t){D.txns.push({id:Date.now()+Math.random(),type:t.type,amount:t.amount,category:t.category,note:t.note,date:t.date});});
   autoApplyAlloc();
   sv();cMod('bulkOv');rHome();if(curPg==='goals')rGoals();
-  // FIX 1: auto-dismiss toast after 1 second
   showToast('✅ '+ti.length+' transaction'+(ti.length>1?'s':'')+' imported!'+(dupSelected.length?' ('+dupSelected.length+' dup)':''));
 }
 
