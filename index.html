@@ -394,6 +394,23 @@ select.fi option{background:#fff}
 <!-- Toast notification -->
 <div id="toastBar" style="position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);background:#1C1C1E;color:#fff;font-size:13px;font-weight:600;padding:12px 24px;border-radius:99px;z-index:900;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.25);"></div>
 
+<!-- Category drill-down modal -->
+<div class="ov" id="catDrillOv" onclick="cMod('catDrillOv',event)">
+  <div class="modal" style="max-height:85vh;overflow-y:auto;">
+    <div class="mh"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <div class="mt" id="catDrillTitle" style="margin-bottom:0;"></div>
+      <div style="font-size:13px;color:var(--ink2);" id="catDrillMonth"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;background:var(--bg);border-radius:12px;padding:12px 16px;margin-bottom:16px;">
+      <div><div style="font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.4px;">TOTAL</div><div style="font-size:18px;font-weight:800;" id="catDrillTotal"></div></div>
+      <div style="text-align:right;"><div style="font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.4px;">TRANSACTIONS</div><div style="font-size:18px;font-weight:800;" id="catDrillCount"></div></div>
+    </div>
+    <div id="catDrillList" style="display:flex;flex-direction:column;gap:8px;"></div>
+    <button class="cbtn" onclick="cMod('catDrillOv')">Close</button>
+  </div>
+</div>
+
 <!-- MODALS -->
 <div class="ov" id="txnOv" onclick="cMod('txnOv',event)"><div class="modal"><div class="mh"></div><div class="mt" id="txnMT">Add Transaction</div><div class="ttog"><button id="btnE" class="tb eon" onclick="setTT('e')">− Expense</button><button id="btnI" class="tb off" onclick="setTT('i')">+ Income</button></div><div class="fg"><label class="fl">Amount (AED)</label><input class="fi" type="number" id="tAmt" placeholder="0.00" min="0" step="0.01"/></div><div class="fg"><label class="fl">Category</label><select class="fi" id="tCat"></select></div><div class="fg"><label class="fl">Note</label><input class="fi" type="text" id="tNote" placeholder="e.g. Grocery shopping"/></div><div class="fg"><label class="fl">Date</label><input class="fi" type="date" id="tDate"/></div><button class="sbtn" id="txnSBtn" onclick="saveTxn()">Add Transaction</button><button class="cbtn" onclick="cMod('txnOv')">Cancel</button></div></div>
 
@@ -1258,6 +1275,7 @@ function drawDonutFull(canvasId,legendId,catData){
   var dpr=window.devicePixelRatio||1,SZ=140;
   cv.width=SZ*dpr;cv.height=SZ*dpr;cv.style.width=SZ+'px';cv.style.height=SZ+'px';
   ctx.scale(dpr,dpr);ctx.clearRect(0,0,SZ,SZ);
+  // Sort all entries by amount descending
   var entries=Object.entries(catData).sort(function(a,b){return b[1]-a[1];});
   var total=entries.reduce(function(a,e){return a+e[1];},0);
   var legendEl=document.getElementById(legendId);
@@ -1268,6 +1286,7 @@ function drawDonutFull(canvasId,legendId,catData){
     if(legendEl)legendEl.innerHTML='<div style="font-size:12px;color:var(--ink3);padding:10px 0;">No data this month</div>';
     return;
   }
+  // Draw ALL slices
   var sa=-Math.PI/2;
   entries.forEach(function(e,i){
     var sl=(e[1]/total)*Math.PI*2;
@@ -1278,17 +1297,49 @@ function drawDonutFull(canvasId,legendId,catData){
   ctx.beginPath();ctx.arc(70,70,36,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
   ctx.fillStyle='#1C1C1E';ctx.font='bold 9px Inter,sans-serif';ctx.textAlign='center';ctx.fillText('TOTAL',70,67);
   ctx.fillStyle='#5E3FD8';ctx.font='bold 10px Inter,sans-serif';ctx.fillText('AED '+total.toLocaleString('en-AE',{maximumFractionDigits:0}),70,80);
+
+  // Show ALL entries in legend (scrollable)
   if(legendEl){
-    legendEl.innerHTML=entries.slice(0,6).map(function(e,i){
-      return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">'
-        +'<span style="width:10px;height:10px;border-radius:3px;background:'+CHART_COLORS[i%CHART_COLORS.length]+';flex-shrink:0;display:inline-block;margin-top:2px;"></span>'
-        +'<div style="flex:1;min-width:0;">'
-        +'<div style="font-size:12px;color:#1C1C1E;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+e[0]+'</div>'
-        +'<div style="font-size:11px;color:#636366;margin-top:1px;">AED '+e[1].toLocaleString('en-AE',{minimumFractionDigits:2,maximumFractionDigits:2})+' <span style="color:'+CHART_COLORS[i%CHART_COLORS.length]+';font-weight:700;">('+((e[1]/total)*100).toFixed(0)+'%)</span></div>'
-        +'</div>'
-        +'</div>';
-    }).join('');
+    var type=legendId.indexOf('Inc')>=0?'i':'e';
+    legendEl.innerHTML='<div style="max-height:200px;overflow-y:auto;">'
+      +entries.map(function(e,i){
+        return '<div onclick="openCatDrill(\''+e[0].replace(/'/g,"\\'")+'\',' + "'"+type+"'" + ')" style="display:flex;align-items:center;gap:6px;margin-bottom:6px;cursor:pointer;padding:5px 8px;border-radius:10px;" onmouseover="this.style.background=\'var(--bg)\'" onmouseout="this.style.background=\'transparent\'">'
+          +'<span style="width:9px;height:9px;border-radius:2px;background:'+CHART_COLORS[i%CHART_COLORS.length]+';flex-shrink:0;display:inline-block;"></span>'
+          +'<div style="flex:1;min-width:0;">'
+          +'<div style="font-size:12px;color:#1C1C1E;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+e[0]+'</div>'
+          +'<div style="font-size:11px;color:#636366;margin-top:1px;">AED '+e[1].toLocaleString('en-AE',{minimumFractionDigits:2,maximumFractionDigits:2})+' <span style="color:'+CHART_COLORS[i%CHART_COLORS.length]+';font-weight:700;">('+((e[1]/total)*100).toFixed(0)+'%)</span></div>'
+          +'</div>'
+          +'<span style="font-size:13px;color:var(--ink3);">›</span>'
+          +'</div>';
+      }).join('')
+      +'</div>';
   }
+}
+
+// ── CATEGORY DRILL DOWN ──
+function openCatDrill(cat,type){
+  var txns=moT(rptMo,rptYr).filter(function(t){return t.category===cat&&t.type===type;});
+  var total=txns.reduce(function(a,t){return a+t.amount;},0);
+  var ico=getICO(cat);
+  document.getElementById('catDrillTitle').textContent=ico+' '+cat;
+  document.getElementById('catDrillMonth').textContent=MOS3[rptMo]+' '+rptYr;
+  document.getElementById('catDrillTotal').textContent=(type==='i'?'+':'-')+' AED '+fmt(total);
+  document.getElementById('catDrillTotal').style.color=type==='i'?'var(--gn)':'var(--rd)';
+  document.getElementById('catDrillCount').textContent=txns.length;
+  // Sort newest first
+  txns.sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+  document.getElementById('catDrillList').innerHTML=txns.length?txns.map(function(t){
+    var d=new Date(t.date+'T00:00:00');
+    var dl=DAYS[d.getDay()].substring(0,3)+', '+d.getDate()+' '+MOS3[d.getMonth()];
+    return '<div style="background:var(--bg);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;">'
+      +'<div style="flex:1;min-width:0;">'
+      +'<div style="font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(t.note||cat)+'</div>'
+      +'<div style="font-size:12px;color:var(--ink3);margin-top:2px;">'+dl+'</div>'
+      +'</div>'
+      +'<div style="font-size:15px;font-weight:700;color:'+(type==='i'?'var(--gn)':'var(--rd)')+';white-space:nowrap;">'+(type==='i'?'+':'-')+'AED '+fmt(t.amount)+'</div>'
+      +'</div>';
+  }).join(''):'<div style="text-align:center;padding:30px;color:var(--ink3);font-size:13px;">No transactions this month</div>';
+  document.getElementById('catDrillOv').classList.add('on');
 }
 
 // Wire up legend IDs correctly when calling drawDonut
