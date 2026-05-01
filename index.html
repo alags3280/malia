@@ -17,8 +17,11 @@
   --am:#FF9500;--aml:#FFF3E0;--bd:#E5E5EA;--r:16px;--sh:0 2px 12px rgba(0,0,0,.06)
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{height:-webkit-fill-available;height:100dvh;overflow:hidden;position:fixed;width:100%;}
-body{font-family:'Inter',sans-serif;color:var(--ink);padding-bottom:84px;-webkit-font-smoothing:antialiased;height:100%;height:-webkit-fill-available;height:100dvh;overflow-y:auto;overflow-x:hidden;position:relative;width:100%;-webkit-overflow-scrolling:touch;}
+html{height:100%;overflow:hidden;}
+body{font-family:'Inter',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;
+  position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden;background:var(--bg);}
+#appScroll{position:absolute;top:0;left:0;right:0;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;background:var(--bg);}
 ::-webkit-scrollbar{display:none}
 .pg{display:none}.pg.on{display:block;animation:fu .2s ease both}
 @keyframes fu{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
@@ -213,6 +216,7 @@ select.fi option{background:#fff}
 </style>
 </head>
 <body>
+<div id="appScroll">
 
 <!-- ══ HOME ══ -->
 <div id="pg-home" class="pg on">
@@ -1490,6 +1494,47 @@ function rReports(){
   drawDonutFull('rptIncDonut','rptIncDonutLegend',catInc);
 }
 
+// ── VIEWPORT & KEYBOARD FIXES ──
+(function(){
+  var scr=document.getElementById('appScroll');
+
+  // Set real height once — never update on keyboard open (that causes the jump)
+  function lockHeight(){
+    var h=window.innerHeight;
+    scr.style.height=h+'px';
+    scr.style.maxHeight=h+'px';
+  }
+  lockHeight();
+  // Only re-lock on orientation change, NOT on resize (keyboard triggers resize)
+  window.addEventListener('orientationchange',function(){setTimeout(lockHeight,400);},{passive:true});
+
+  // When an input is focused inside a modal, scroll it into view above keyboard
+  document.addEventListener('focusin',function(e){
+    var tag=e.target.tagName;
+    if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT'){
+      // Find if inside a modal
+      var p=e.target.parentElement;
+      while(p){if(p.classList&&p.classList.contains('modal')){break;}p=p.parentElement;}
+      if(p){
+        setTimeout(function(){
+          e.target.scrollIntoView({behavior:'smooth',block:'center'});
+        },350);
+      }
+    }
+  });
+
+  // Prevent background scroll — only allow scroll inside designated containers
+  document.body.addEventListener('touchmove',function(e){
+    var el=e.target;
+    while(el&&el!==document.body){
+      if(el===scr||el.classList.contains('modal')||el.id==='bulkList'||el.id==='catPickBtns'||el.id==='catDrillList'){return;}
+      el=el.parentElement;
+    }
+    e.preventDefault();
+  },{passive:false});
+})();
+
 </script>
+</div><!-- /appScroll -->
 </body>
 </html>
