@@ -212,6 +212,30 @@ select.fi option{background:#fff}
 .alloc-slider{flex:1;-webkit-appearance:none;height:6px;border-radius:3px;background:var(--vil);outline:none;cursor:pointer}
 .alloc-slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--vi);cursor:pointer;box-shadow:0 2px 6px rgba(94,63,216,.4)}
 .alloc-val{font-size:16px;font-weight:800;color:var(--vi);min-width:44px;text-align:right}
+/* CREDIT CARD */
+.cc-card{border-radius:20px;padding:20px;position:relative;overflow:hidden;margin-bottom:2px;cursor:pointer;}
+.cc-card::before{content:'';position:absolute;top:-30px;right:-30px;width:130px;height:130px;background:rgba(255,255,255,.1);border-radius:50%;}
+.cc-card::after{content:'';position:absolute;bottom:-40px;right:20px;width:100px;height:100px;background:rgba(255,255,255,.07);border-radius:50%;}
+.cc-bank{font-size:11px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.6px;text-transform:uppercase;margin-bottom:4px;}
+.cc-name{font-size:17px;font-weight:800;color:#fff;margin-bottom:14px;}
+.cc-bal-lbl{font-size:10px;font-weight:600;color:rgba(255,255,255,.65);letter-spacing:.5px;text-transform:uppercase;}
+.cc-bal{font-size:26px;font-weight:800;color:#fff;letter-spacing:-.3px;margin-bottom:2px;}
+.cc-limit{font-size:11px;color:rgba(255,255,255,.6);}
+.cc-bar-bg{height:5px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden;margin:10px 0;}
+.cc-bar{height:100%;border-radius:99px;transition:width .5s;}
+.cc-actions{display:flex;gap:8px;margin-top:12px;position:relative;z-index:1;}
+.cc-act-btn{flex:1;background:rgba(255,255,255,.2);border:none;color:#fff;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;padding:9px;border-radius:10px;cursor:pointer;}
+.cc-stat{flex:1;background:var(--card);border-radius:12px;padding:10px 12px;box-shadow:var(--sh);}
+.cc-stat-lbl{font-size:10px;font-weight:700;color:var(--ink3);letter-spacing:.4px;text-transform:uppercase;}
+.cc-stat-val{font-size:15px;font-weight:800;margin-top:2px;}
+.cc-txn-row{background:var(--bg);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;}
+.cc-txn-ico{width:36px;height:36px;border-radius:10px;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.cc-txn-body{flex:1;min-width:0;}
+.cc-txn-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cc-txn-date{font-size:11px;color:var(--ink3);margin-top:1px;}
+.cc-txn-amt{font-size:14px;font-weight:700;white-space:nowrap;}
+.cc-due-warn{background:var(--rdl);border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:12px;color:var(--rd);font-weight:600;display:flex;align-items:center;gap:8px;}
+.cc-due-ok{background:var(--gnl);border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:12px;color:#1B8A3A;font-weight:600;display:flex;align-items:center;gap:8px;}
 .info-box{background:var(--vil);border-radius:12px;padding:12px;margin-bottom:14px;font-size:12px;color:var(--vi);line-height:1.6;font-weight:500}
 </style>
 </head>
@@ -394,22 +418,37 @@ select.fi option{background:#fff}
   <div style="height:16px;"></div>
 </div>
 
+<!-- ══ CREDIT CARDS ══ -->
+<div id="pg-cards" class="pg">
+  <div class="ph">
+    <div><div class="ph-title">Credit Cards</div><div class="ph-sub">Track balances & payments</div></div>
+    <button class="ph-fab" onclick="openAddCardMod()">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+  </div>
+  <!-- Summary bar -->
+  <div style="display:flex;gap:10px;padding:0 20px 16px;" id="cardSummary"></div>
+  <!-- Cards list -->
+  <div id="cardsList" style="padding:0 20px;display:flex;flex-direction:column;gap:14px;"></div>
+  <div style="height:16px;"></div>
+</div>
+
 <!-- ══ NAV ══ -->
 <nav>
   <button class="nb on" onclick="showPg('home')" id="nav-home">
-    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Dashboard
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
   </button>
   <button class="nb" onclick="showPg('transactions')" id="nav-transactions">
-    <svg viewBox="0 0 24 24"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>Transactions
+    <svg viewBox="0 0 24 24"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>Txns
+  </button>
+  <button class="nb" onclick="showPg('cards')" id="nav-cards">
+    <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Cards
   </button>
   <button class="nb" onclick="showPg('goals')" id="nav-goals">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Goals
   </button>
   <button class="nb" onclick="showPg('reports')" id="nav-reports">
     <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reports
-  </button>
-  <button class="nb" onclick="showPg('categories')" id="nav-categories">
-    <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Categories
   </button>
 </nav>
 
@@ -516,6 +555,60 @@ select.fi option{background:#fff}
 <button class="cbtn" onclick="cMod('settingsOv')">Close</button>
 </div></div>
 
+<!-- ══ CARD MODALS ══ -->
+<!-- Add/Edit Card -->
+<div class="ov" id="addCardOv" onclick="cMod('addCardOv',event)">
+  <div class="modal">
+    <div class="mh"></div>
+    <div class="mt" id="addCardMT">Add Credit Card</div>
+    <div class="fg"><label class="fl">Card Name</label><input class="fi" type="text" id="cardName" placeholder="e.g. ADCB Platinum"/></div>
+    <div class="fg"><label class="fl">Bank</label><input class="fi" type="text" id="cardBank" placeholder="e.g. ADCB"/></div>
+    <div class="fg"><label class="fl">Credit Limit (AED)</label><input class="fi" type="number" id="cardLimit" placeholder="0.00" min="0"/></div>
+    <div class="fg"><label class="fl">Opening Outstanding Balance (AED)</label><input class="fi" type="number" id="cardOpening" placeholder="Balance you owe as of today" min="0"/></div>
+    <div class="fg"><label class="fl">Statement Date</label><input class="fi" type="number" id="cardStmtDay" placeholder="Day of month (e.g. 25)" min="1" max="31"/></div>
+    <div class="fg"><label class="fl">Due Date (days after statement)</label><input class="fi" type="number" id="cardDueDay" placeholder="e.g. 20" min="1" max="30"/></div>
+    <button class="sbtn" id="addCardBtn" onclick="saveCard()">Add Card</button>
+    <button class="cbtn" onclick="cMod('addCardOv')">Cancel</button>
+  </div>
+</div>
+
+<!-- Record Card Spend -->
+<div class="ov" id="cardSpendOv" onclick="cMod('cardSpendOv',event)">
+  <div class="modal">
+    <div class="mh"></div>
+    <div class="mt" id="cardSpendMT">Record Spend</div>
+    <div class="fg"><label class="fl">Amount (AED)</label><input class="fi" type="number" id="cardSpendAmt" placeholder="0.00" min="0" step="0.01"/></div>
+    <div class="fg"><label class="fl">Category</label><select class="fi" id="cardSpendCat"></select></div>
+    <div class="fg"><label class="fl">Note</label><input class="fi" type="text" id="cardSpendNote" placeholder="e.g. Grocery shopping"/></div>
+    <div class="fg"><label class="fl">Date</label><input class="fi" type="date" id="cardSpendDate"/></div>
+    <button class="sbtn" onclick="saveCardSpend()">Save Spend</button>
+    <button class="cbtn" onclick="cMod('cardSpendOv')">Cancel</button>
+  </div>
+</div>
+
+<!-- Record Card Payment -->
+<div class="ov" id="cardPayOv" onclick="cMod('cardPayOv',event)">
+  <div class="modal">
+    <div class="mh"></div>
+    <div class="mt" id="cardPayMT">Record Payment</div>
+    <div style="background:var(--gnl);border-radius:10px;padding:10px;margin-bottom:14px;font-size:12px;color:#1B8A3A;font-weight:500;">This records money paid TO the card — reduces your outstanding balance.</div>
+    <div class="fg"><label class="fl">Amount Paid (AED)</label><input class="fi" type="number" id="cardPayAmt" placeholder="0.00" min="0" step="0.01"/></div>
+    <div class="fg"><label class="fl">Date</label><input class="fi" type="date" id="cardPayDate"/></div>
+    <button class="sbtn" onclick="saveCardPayment()">Record Payment</button>
+    <button class="cbtn" onclick="cMod('cardPayOv')">Cancel</button>
+  </div>
+</div>
+
+<!-- Card Transactions -->
+<div class="ov" id="cardTxnOv" onclick="cMod('cardTxnOv',event)">
+  <div class="modal" style="max-height:88vh;overflow-y:auto;">
+    <div class="mh"></div>
+    <div class="mt" id="cardTxnMT">Card Transactions</div>
+    <div id="cardTxnList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
+    <button class="cbtn" onclick="cMod('cardTxnOv')">Close</button>
+  </div>
+</div>
+
 <script>
 var S='malia-v3',SFROM='2026-04-01';
 var MOS3=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -584,7 +677,7 @@ function showPg(p){
   document.querySelectorAll('.nb').forEach(function(x){x.classList.remove('on');});
   document.getElementById('pg-'+p).classList.add('on');
   var nb=document.getElementById('nav-'+p);if(nb)nb.classList.add('on');
-  ({home:rHome,transactions:rTxns,goals:rGoals,categories:rCats,reports:rReports})[p]&&({home:rHome,transactions:rTxns,goals:rGoals,categories:rCats,reports:rReports})[p]();
+  ({home:rHome,transactions:rTxns,goals:rGoals,categories:rCats,reports:rReports,cards:rCards})[p]&&({home:rHome,transactions:rTxns,goals:rGoals,categories:rCats,reports:rReports,cards:rCards})[p]();
 }
 function cMod(id,e){if(!e||e.target===document.getElementById(id))document.getElementById(id).classList.remove('on');}
 
@@ -1195,12 +1288,212 @@ function learnCat(note,category,type){
   var key=note.toLowerCase().trim().substring(0,30);
   D.catMemory[key]={cat:category,type:type};
 }
+// ── CREDIT CARDS ──
+if(!D.cards)D.cards=[];
+var CC_COLORS=['linear-gradient(135deg,#1a1a2e,#16213e)','linear-gradient(135deg,#0f3460,#533483)','linear-gradient(135deg,#2d6a4f,#1b4332)','linear-gradient(135deg,#6d1b7b,#4a0072)','linear-gradient(135deg,#b5451b,#7f2d00)','linear-gradient(135deg,#1565c0,#0d47a1)'];
+var editCardId=null,activeCardId=null;
+
+function rCards(){
+  // Summary
+  var totalOwed=D.cards.reduce(function(a,c){return a+calcOwed(c);},0);
+  var totalLimit=D.cards.reduce(function(a,c){return a+(c.limit||0);},0);
+  var sumEl=document.getElementById('cardSummary');
+  sumEl.innerHTML=D.cards.length?
+    '<div class="cc-stat"><div class="cc-stat-lbl">Total Owed</div><div class="cc-stat-val" style="color:var(--rd);">AED '+fmt(totalOwed)+'</div></div>'
+    +'<div class="cc-stat"><div class="cc-stat-lbl">Total Limit</div><div class="cc-stat-val">AED '+fmt(totalLimit)+'</div></div>'
+    +'<div class="cc-stat"><div class="cc-stat-lbl">Available</div><div class="cc-stat-val" style="color:var(--gn);">AED '+fmt(Math.max(0,totalLimit-totalOwed))+'</div></div>'
+    :'';
+
+  var el=document.getElementById('cardsList');
+  if(!D.cards.length){
+    el.innerHTML='<div class="empty-s"><div class="empty-s-ico">💳</div><div class="empty-s-txt">No cards yet. Tap + to add one.</div></div>';
+    return;
+  }
+  el.innerHTML=D.cards.map(function(c,i){
+    var owed=calcOwed(c);
+    var usedPct=c.limit>0?Math.min(100,(owed/c.limit)*100):0;
+    var barColor=usedPct>80?'#FF3B30':usedPct>50?'#FF9500':'#34C759';
+    var dueInfo=getDueInfo(c);
+    var thisMonthSpend=getCardSpend(c.id,new Date().getMonth(),new Date().getFullYear());
+    return '<div>'
+      // Due warning
+      +(dueInfo.urgent?'<div class="cc-due-warn">⚠️ Payment due in '+dueInfo.days+' day'+(dueInfo.days!==1?'s':'')+' — AED '+fmt(owed)+'</div>'
+        :dueInfo.days<=10?'<div class="cc-due-ok">✅ Next due in '+dueInfo.days+' days</div>':'')
+      // Card visual
+      +'<div class="cc-card" style="background:'+CC_COLORS[i%CC_COLORS.length]+'" onclick="showCardTxns(\''+c.id+'\')">'
+      +'<div class="cc-bank">'+c.bank+'</div>'
+      +'<div class="cc-name">'+c.name+'</div>'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-end;position:relative;z-index:1;">'
+      +'<div><div class="cc-bal-lbl">Outstanding</div><div class="cc-bal">AED '+fmt(owed)+'</div><div class="cc-limit">Limit: AED '+fmt(c.limit)+'</div></div>'
+      +'<div style="text-align:right;"><div class="cc-bal-lbl">This Month</div><div style="font-size:18px;font-weight:700;color:#fff;">AED '+fmt(thisMonthSpend)+'</div></div>'
+      +'</div>'
+      +'<div class="cc-bar-bg"><div class="cc-bar" style="width:'+usedPct+'%;background:'+barColor+';"></div></div>'
+      +'<div style="font-size:10px;color:rgba(255,255,255,.6);position:relative;z-index:1;">'+usedPct.toFixed(0)+'% of limit used</div>'
+      +'<div class="cc-actions">'
+      +'<button class="cc-act-btn" onclick="event.stopPropagation();openCardSpend(\''+c.id+'\')">+ Spend</button>'
+      +'<button class="cc-act-btn" onclick="event.stopPropagation();openCardPay(\''+c.id+'\')">💳 Pay</button>'
+      +'<button class="cc-act-btn" onclick="event.stopPropagation();openEditCard(\''+c.id+'\')">✏️ Edit</button>'
+      +'<button class="cc-act-btn" style="background:rgba(255,59,48,.4);" onclick="event.stopPropagation();delCard(\''+c.id+'\')">🗑️</button>'
+      +'</div>'
+      +'</div></div>';
+  }).join('');
+}
+
+function calcOwed(c){
+  // Opening balance + all spends - all payments
+  var spends=(c.txns||[]).filter(function(t){return t.type==='spend';}).reduce(function(a,t){return a+t.amount;},0);
+  var pays=(c.txns||[]).filter(function(t){return t.type==='pay';}).reduce(function(a,t){return a+t.amount;},0);
+  return Math.max(0,(c.opening||0)+spends-pays);
+}
+
+function getCardSpend(cid,mo,yr){
+  var c=D.cards.find(function(c){return c.id===cid;});if(!c)return 0;
+  return (c.txns||[]).filter(function(t){
+    var d=new Date(t.date);return t.type==='spend'&&d.getMonth()===mo&&d.getFullYear()===yr;
+  }).reduce(function(a,t){return a+t.amount;},0);
+}
+
+function getDueInfo(c){
+  var today=new Date();today.setHours(0,0,0,0);
+  var stmtDay=c.stmtDay||25;
+  var dueAfter=c.dueDay||20;
+  // Next statement date
+  var stmtDate=new Date(today.getFullYear(),today.getMonth(),stmtDay);
+  if(stmtDate<today)stmtDate=new Date(today.getFullYear(),today.getMonth()+1,stmtDay);
+  var dueDate=new Date(stmtDate);dueDate.setDate(dueDate.getDate()+dueAfter);
+  var days=Math.ceil((dueDate-today)/86400000);
+  return{days:Math.max(0,days),urgent:days<=5&&days>=0};
+}
+
+function openAddCardMod(){
+  editCardId=null;
+  document.getElementById('addCardMT').textContent='Add Credit Card';
+  document.getElementById('addCardBtn').textContent='Add Card';
+  ['cardName','cardBank','cardLimit','cardOpening','cardStmtDay','cardDueDay'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('addCardOv').classList.add('on');
+}
+function openEditCard(id){
+  editCardId=id;var c=D.cards.find(function(c){return c.id===id;});if(!c)return;
+  document.getElementById('addCardMT').textContent='Edit Card';
+  document.getElementById('addCardBtn').textContent='Save Changes';
+  document.getElementById('cardName').value=c.name;
+  document.getElementById('cardBank').value=c.bank;
+  document.getElementById('cardLimit').value=c.limit;
+  document.getElementById('cardOpening').value=c.opening||0;
+  document.getElementById('cardStmtDay').value=c.stmtDay||25;
+  document.getElementById('cardDueDay').value=c.dueDay||20;
+  document.getElementById('addCardOv').classList.add('on');
+}
+function saveCard(){
+  var name=document.getElementById('cardName').value.trim();
+  var bank=document.getElementById('cardBank').value.trim();
+  var limit=parseFloat(document.getElementById('cardLimit').value)||0;
+  var opening=parseFloat(document.getElementById('cardOpening').value)||0;
+  var stmtDay=parseInt(document.getElementById('cardStmtDay').value)||25;
+  var dueDay=parseInt(document.getElementById('cardDueDay').value)||20;
+  if(!name)return;
+  if(editCardId){
+    var c=D.cards.find(function(c){return c.id===editCardId;});
+    if(c){c.name=name;c.bank=bank;c.limit=limit;c.opening=opening;c.stmtDay=stmtDay;c.dueDay=dueDay;}
+  } else {
+    D.cards.push({id:'c'+Date.now(),name:name,bank:bank,limit:limit,opening:opening,stmtDay:stmtDay,dueDay:dueDay,txns:[]});
+  }
+  sv();cMod('addCardOv');rCards();showToast('✅ Card saved!');
+}
+function delCard(id){if(!confirm('Delete this card and all its transactions?'))return;D.cards=D.cards.filter(function(c){return c.id!==id;});sv();rCards();}
+
+function openCardSpend(id){
+  activeCardId=id;var c=D.cards.find(function(c){return c.id===id;});
+  document.getElementById('cardSpendMT').textContent='Spend on '+c.name;
+  document.getElementById('cardSpendAmt').value='';
+  document.getElementById('cardSpendNote').value='';
+  document.getElementById('cardSpendDate').value=td();
+  // Populate categories
+  var sel=document.getElementById('cardSpendCat');
+  sel.innerHTML=D.ec.map(function(c){var n=catName(c);return '<option value="'+n+'">'+emoLabel(c)+' '+n+'</option>';}).join('');
+  document.getElementById('cardSpendOv').classList.add('on');
+}
+function saveCardSpend(){
+  var amt=parseFloat(document.getElementById('cardSpendAmt').value);if(!amt||amt<=0)return;
+  var cat=document.getElementById('cardSpendCat').value;
+  var note=document.getElementById('cardSpendNote').value.trim();
+  var date=document.getElementById('cardSpendDate').value||td();
+  var c=D.cards.find(function(c){return c.id===activeCardId;});if(!c)return;
+  if(!c.txns)c.txns=[];
+  c.txns.push({id:Date.now(),type:'spend',amount:amt,category:cat,note:note,date:date});
+  // Also add to main transactions as expense so reports/balance update
+  D.txns.push({id:Date.now()+1,type:'e',amount:amt,category:cat,note:(note||cat)+' ['+c.name+']',date:date});
+  learnCat(note,cat,'e');
+  autoApplyAlloc();sv();cMod('cardSpendOv');rCards();rHome();
+  showToast('✅ Spend recorded on '+c.name);
+}
+
+function openCardPay(id){
+  activeCardId=id;var c=D.cards.find(function(c){return c.id===id;});
+  document.getElementById('cardPayMT').textContent='Pay '+c.name;
+  var owed=calcOwed(c);
+  document.getElementById('cardPayAmt').value=owed.toFixed(2);
+  document.getElementById('cardPayDate').value=td();
+  document.getElementById('cardPayOv').classList.add('on');
+}
+function saveCardPayment(){
+  var amt=parseFloat(document.getElementById('cardPayAmt').value);if(!amt||amt<=0)return;
+  var date=document.getElementById('cardPayDate').value||td();
+  var c=D.cards.find(function(c){return c.id===activeCardId;});if(!c)return;
+  if(!c.txns)c.txns=[];
+  c.txns.push({id:Date.now(),type:'pay',amount:amt,date:date});
+  // Add to main transactions as expense (money leaving bank to pay card)
+  D.txns.push({id:Date.now()+1,type:'e',amount:amt,category:'Credit Card Payment',note:'Payment to '+c.name,date:date});
+  // Ensure CC Payment category exists
+  if(D.ec.indexOf('💳|Credit Card Payment')<0)D.ec.push('💳|Credit Card Payment');
+  sv();cMod('cardPayOv');rCards();rHome();
+  showToast('✅ Payment of AED '+fmt(amt)+' recorded');
+}
+
+function showCardTxns(id){
+  var c=D.cards.find(function(c){return c.id===id;});if(!c)return;
+  document.getElementById('cardTxnMT').textContent=c.name+' Transactions';
+  var txns=(c.txns||[]).slice().sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+  var owed=calcOwed(c);
+  document.getElementById('cardTxnList').innerHTML=
+    '<div style="display:flex;justify-content:space-between;background:var(--rdl);border-radius:12px;padding:12px 16px;margin-bottom:8px;">'
+    +'<div><div style="font-size:11px;font-weight:700;color:var(--rd);">OUTSTANDING</div><div style="font-size:20px;font-weight:800;color:var(--rd);">AED '+fmt(owed)+'</div></div>'
+    +'<div style="text-align:right;"><div style="font-size:11px;font-weight:700;color:var(--ink3);">LIMIT</div><div style="font-size:20px;font-weight:800;">AED '+fmt(c.limit)+'</div></div>'
+    +'</div>'
+    +(txns.length?txns.map(function(t){
+      var isSpend=t.type==='spend';
+      var d=new Date(t.date+'T00:00:00');
+      var dl=MOS3[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear();
+      return '<div class="cc-txn-row">'
+        +'<div class="cc-txn-ico">'+(isSpend?getICO(t.category||''):'💳')+'</div>'
+        +'<div class="cc-txn-body"><div class="cc-txn-name">'+(t.note||t.category||'Payment')+'</div><div class="cc-txn-date">'+(isSpend?t.category+' · ':'')+dl+'</div></div>'
+        +'<div class="cc-txn-amt" style="color:'+(isSpend?'var(--rd)':'var(--gn)')+'">'+(isSpend?'-':'+')+'AED '+fmt(t.amount)+'</div>'
+        +'</div>';
+    }).join(''):'<div class="empty-s"><div class="empty-s-txt">No transactions yet</div></div>');
+  document.getElementById('cardTxnOv').classList.add('on');
+}
 var smsTp='e';
 function showSmsConf(parsed){smsTp=parsed.type;setSmsT(parsed.type);document.getElementById('smsAmt').value=parsed.amount;document.getElementById('smsNote').value=parsed.note;document.getElementById('smsDt').value=parsed.date;var sel=document.getElementById('smsCat');for(var i=0;i<sel.options.length;i++){if(sel.options[i].value===parsed.category){sel.selectedIndex=i;break;}}document.getElementById('smsConfOv').classList.add('on');}
 function setSmsT(t){smsTp=t;document.getElementById('smsE').className='tb '+(t==='e'?'eon':'off');document.getElementById('smsI').className='tb '+(t==='i'?'ion':'off');var sel=document.getElementById('smsCat');sel.innerHTML=(t==='e'?D.ec:D.ic).map(function(c){var n=catName(c);return '<option value="'+n+'">'+n+'</option>';}).join('');}
 
-var bTxns=[];
-function openSmsMod(){document.getElementById('smsTxt').value='';document.getElementById('smsOv').classList.add('on');}
+// Detect if SMS is a credit card transaction and which card it belongs to
+function detectCard(txt){
+  if(!D.cards||!D.cards.length)return null;
+  var tl=txt.toLowerCase();
+  // Check if SMS mentions any card's bank name
+  for(var i=0;i<D.cards.length;i++){
+    var c=D.cards[i];
+    var bankWords=c.bank.toLowerCase().split(/\s+/);
+    var nameWords=c.name.toLowerCase().split(/\s+/);
+    var allWords=bankWords.concat(nameWords).filter(function(w){return w.length>=3;});
+    for(var j=0;j<allWords.length;j++){
+      if(tl.indexOf(allWords[j])>=0)return c;
+    }
+  }
+  // Generic CC keywords
+  if(/credit card|card ending|card no\.|xxxx|ending \d{4}|card \*{4}/i.test(txt))return 'cc';
+  return null;
+}
 function splitMsgs(raw){var bl=raw.split(/\n{2,}/);if(bl.length>1)return bl.map(function(b){return b.replace(/\n/g,' ').trim();}).filter(function(b){return b.length>20;});return raw.split(/(?=(?:Dear|Your ADCB|Your ENBD|ADCB:|ENBD:))/i).map(function(b){return b.replace(/\n/g,' ').trim();}).filter(function(b){return b.length>20;});}
 
 function bulkParse(){
@@ -1213,8 +1506,9 @@ function bulkParse(){
     if(p.date<SFROM){skD++;return;}
     var dup=isDup(p);
     if(dup)dupCount++;
-    // Include duplicates but mark them — unchecked by default
-    bTxns.push({amount:p.amount,type:p.type,note:p.note,date:p.date,category:p.category,sel:!dup,isDup:dup});
+    // Detect if this is a credit card SMS
+    var card=detectCard(msg);
+    bTxns.push({amount:p.amount,type:p.type,note:p.note,date:p.date,category:p.category,sel:!dup,isDup:dup,card:card});
   });
   if(!bTxns.length){
     alert('No transactions found.\n'+skD+' before Apr 1\n'+fail+' unreadable');return;
@@ -1252,21 +1546,31 @@ function bulkParse(){
     return opts;
   }
 
+  // Build card options helper
+  function cardOpts(selectedId){
+    if(!D.cards||!D.cards.length)return '';
+    var opts='<option value="">No card (plain expense)</option>';
+    opts+=D.cards.map(function(c){return '<option value="'+c.id+'"'+(c.id===selectedId?' selected':'')+'>💳 '+c.name+'</option>';}).join('');
+    return opts;
+  }
+
   // Transaction rows
   document.getElementById('bulkList').innerHTML=bTxns.map(function(t,i){
-    var borderColor=t.isDup?'#FFB74D':'var(--vi)';
-    var bgColor=t.isDup?'#FFFBF5':'var(--card)';
-    var dupTag=t.isDup?'<span style="background:#FFB74D;color:#7A3800;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap;">⚠️ DUPLICATE</span>':'';
+    var borderColor=t.isDup?'#FFB74D':t.card?'#1565c0':'var(--vi)';
+    var bgColor=t.isDup?'#FFFBF5':t.card?'#EEF4FF':'var(--card)';
+    var dupTag=t.isDup?'<span style="background:#FFB74D;color:#7A3800;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap;">⚠️ DUP</span>':'';
+    var ccName=t.card&&t.card!=='cc'?t.card.name:t.card==='cc'?'Credit Card':'';
+    var ccTag=ccName?'<span style="background:#1565c0;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap;">💳 '+ccName+'</span>':'';
+    var hasCards=D.cards&&D.cards.length>0&&t.type==='e';
+    var preselCard=t.card&&t.card!=='cc'?t.card.id:'';
     return '<div style="background:'+bgColor+';border:1.5px solid '+borderColor+';border-radius:12px;padding:12px;margin-bottom:2px;" id="br'+i+'">'
-      // Row 1: checkbox + type pill + dup tag
-      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">'
+      +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;">'
       +'<input type="checkbox" '+(t.sel?'checked':'')+' onchange="togBR('+i+',this.checked)" style="width:18px;height:18px;accent-color:var(--vi);cursor:pointer;flex-shrink:0;"/>'
       +'<span class="pill '+(t.type==='i'?'pill-g':'pill-r')+'">'+(t.type==='i'?'+ Income':'- Expense')+'</span>'
-      +dupTag
-      +'<span style="flex:1;font-size:12px;color:var(--ink3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(t.note||'')+'</span>'
+      +dupTag+ccTag
+      +'<span style="flex:1;font-size:11px;color:var(--ink3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(t.note||'')+'</span>'
       +'<span style="font-size:11px;color:var(--ink3);">'+new Date(t.date+'T00:00:00').toLocaleDateString('en-AE',{day:'numeric',month:'short'})+'</span>'
       +'</div>'
-      // Row 2: editable amount + category dropdown side by side
       +'<div style="display:flex;gap:8px;align-items:center;">'
       +'<div style="display:flex;align-items:center;background:var(--bg);border:1.5px solid var(--bd);border-radius:10px;padding:8px 10px;gap:4px;flex:0 0 auto;">'
       +'<span style="font-size:11px;font-weight:700;color:var(--ink3);">AED</span>'
@@ -1276,6 +1580,10 @@ function bulkParse(){
       +catOpts(t.type,t.category)
       +'</select>'
       +'</div>'
+      +(hasCards?'<div style="margin-top:8px;">'
+        +'<select id="bcard'+i+'" onchange="updBRCard('+i+',this)" style="width:100%;background:'+(preselCard?'#EEF4FF':'var(--bg)')+';border:1.5px solid '+(preselCard?'#1565c0':'var(--bd)')+';border-radius:10px;padding:9px 10px;font-size:13px;font-weight:600;color:'+(preselCard?'#1565c0':'var(--ink2)')+';font-family:Inter,sans-serif;outline:none;">'
+        +cardOpts(preselCard)
+        +'</select></div>':'')
       +(t.isDup?'<div style="font-size:11px;color:#E65100;margin-top:6px;font-weight:600;">⚠️ Already in your transactions — tick to import anyway</div>':'')
       +'</div>';
   }).join('');
