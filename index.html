@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Malia"/>
 <meta name="theme-color" content="#5E3FD8"/>
-<title>Malia v2.0</title>
+<title>Malia v3.0</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -246,7 +246,7 @@ select.fi option{background:#fff}
 <div id="pg-home" class="pg on">
   <div class="home-hdr">
     <div>
-      <div class="home-greet">Welcome back 👋 <span style="font-size:10px;background:var(--vil);color:var(--vi);font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle;">v2.0</span></div>
+      <div class="home-greet">Welcome back 👋 <span style="font-size:10px;background:var(--vil);color:var(--vi);font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle;">v3.0</span></div>
       <div class="home-name">Hi, <span id="hName">Alags</span>! ⭐</div>
     </div>
     <div class="home-btns">
@@ -1216,6 +1216,7 @@ function setAccent(c,cl){aAccent(c,cl);sProf({accent:c,accentLight:cl});}
 function aAccent(c,cl){document.documentElement.style.setProperty('--vi',c);document.documentElement.style.setProperty('--vi2',c);document.documentElement.style.setProperty('--vil',cl||c+'22');document.querySelectorAll('.sw-c').forEach(function(b){b.classList.toggle('as',b.style.background===c);});}
 
 var APP_URL='https://earnest-gumdrop-2763d9.netlify.app';
+function openSmsMod(){document.getElementById('smsTxt').value='';document.getElementById('smsOv').classList.add('on');}
 function initSmsUrl(){var el=document.getElementById('shortcutUrl');if(el)el.textContent=APP_URL+'?sms={ShortcutInput}';}
 function copyUrl(){navigator.clipboard.writeText(APP_URL+'?sms={ShortcutInput}').then(function(){var b=document.getElementById('copyBtn');b.textContent='Copied!';b.style.background='#059669';setTimeout(function(){b.textContent='Copy';b.style.background='var(--vi)';},2000);});}
 function hUrlSms(){var p=new URLSearchParams(window.location.search);var sms=p.get('sms');if(!sms)return;window.history.replaceState({},'',window.location.pathname);var parsed=pSms(decodeURIComponent(sms));if(!parsed)return;if(parsed.date<SFROM)return;if(isDup(parsed)){alert('Already exists — skipped.');return;}showSmsConf(parsed);}
