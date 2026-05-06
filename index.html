@@ -663,7 +663,7 @@ function computeAlloc(){
     if(g.alloc>0){
       var amt=pot*(g.alloc/100);
       var rem=Math.max(0,g.target-g.saved);
-      amt=Math.min(amt,rem); // don't overfund
+      amt=Math.min(amt,rem); // do not overfund
       if(amt>0)results.push({id:g.id,name:g.name,emoji:g.emoji||'🎯',amt:amt});
     }
   });
@@ -1581,7 +1581,7 @@ function bulkParse(){
       +'</select>'
       +'</div>'
       +(hasCards?'<div style="margin-top:8px;">'
-        +'<select id="bcard'+i+'" onchange="updBRCard('+i+',this)" style="width:100%;background:'+(preselCard?'#EEF4FF':'var(--bg)')+';border:1.5px solid '+(preselCard?'#1565c0':'var(--bd)')+';border-radius:10px;padding:9px 10px;font-size:13px;font-weight:600;color:'+(preselCard?'#1565c0':'var(--ink2)')+';font-family:Inter,sans-serif;outline:none;">'
+        +'<select id="bcard'+i+'" onchange="updBRCard('+i+',this)" style="width:100%;background:var(--bg);border:1.5px solid '+(preselCard?'#1565c0':'var(--bd)')+';border-radius:10px;padding:9px 10px;font-size:13px;font-weight:600;color:'+(preselCard?'#1565c0':'#636366')+';font-family:Inter,sans-serif;outline:none;">'
         +cardOpts(preselCard)
         +'</select></div>':'')
       +(t.isDup?'<div style="font-size:11px;color:#E65100;margin-top:6px;font-weight:600;">⚠️ Already in your transactions — tick to import anyway</div>':'')
@@ -1593,6 +1593,50 @@ function bulkParse(){
 
 function togBR(i,v){bTxns[i].sel=v;}
 function updBR(i){var inp=document.getElementById('bamt'+i);if(inp)bTxns[i].amount=parseFloat(inp.value)||bTxns[i].amount;}
+function updBRCard(i,sel){
+  // Update which card this transaction is assigned to
+  bTxns[i].selectedCardId=sel.value||'';
+  sel.style.background=sel.value?'#EEF4FF':'var(--bg)';
+  sel.style.borderColor=sel.value?'#1565c0':'var(--bd)';
+  sel.style.color=sel.value?'#1565c0':'var(--ink2)';
+}
+function importBulk(){
+  var ti=bTxns.filter(function(t){return t.sel;});
+  if(!ti.length){alert('No transactions selected.');return;}
+  var dupSelected=ti.filter(function(t){return t.isDup;});
+  if(dupSelected.length>0){
+    if(!confirm(dupSelected.length+' duplicate'+(dupSelected.length>1?'s':'')+' selected.\nImport them anyway?'))return;
+  }
+  // Read latest edited values from DOM before importing
+  bTxns.forEach(function(t,i){
+    var amtEl=document.getElementById('bamt'+i);
+    var catEl=document.getElementById('bcat'+i);
+    var cardEl=document.getElementById('bcard'+i);
+    if(amtEl){var v=parseFloat(amtEl.value);if(v>0)t.amount=v;}
+    if(catEl&&catEl.value&&catEl.value!=='__new__')t.category=catEl.value;
+    if(cardEl)t.selectedCardId=cardEl.value||'';
+  });
+  var ccCount=0;
+  ti.forEach(function(t){
+    // Add to main transactions
+    D.txns.push({id:Date.now()+Math.random(),type:t.type,amount:t.amount,category:t.category,note:t.note,date:t.date});
+    learnCat(t.note,t.category,t.type);
+    // If assigned to a card, also add as card spend
+    if(t.type==='e'&&t.selectedCardId){
+      var c=D.cards.find(function(c){return c.id===t.selectedCardId;});
+      if(c){
+        if(!c.txns)c.txns=[];
+        c.txns.push({id:Date.now()+Math.random(),type:'spend',amount:t.amount,category:t.category,note:t.note,date:t.date});
+        ccCount++;
+      }
+    }
+  });
+  autoApplyAlloc();
+  sv();cMod('bulkOv');rHome();
+  if(curPg==='goals')rGoals();
+  if(curPg==='cards')rCards();
+  showToast('✅ '+ti.length+' imported'+(ccCount?' · '+ccCount+' to card':'')+(dupSelected.length?' · '+dupSelected.length+' dup':''));
+}
 function chkNewCat(i,sel){
   if(sel.value==='__new__'){
     var nm=prompt('New category name:');
@@ -1614,29 +1658,6 @@ function chkNewCat(i,sel){
     bTxns[i].category=sel.value;
   }
 }
-function importBulk(){
-  var ti=bTxns.filter(function(t){return t.sel;});
-  if(!ti.length){alert('No transactions selected.');return;}
-  var dupSelected=ti.filter(function(t){return t.isDup;});
-  if(dupSelected.length>0){
-    if(!confirm(dupSelected.length+' duplicate'+(dupSelected.length>1?'s':'')+' selected.\nImport them anyway?'))return;
-  }
-  // Read latest edited values from DOM before importing
-  bTxns.forEach(function(t,i){
-    var amtEl=document.getElementById('bamt'+i);
-    var catEl=document.getElementById('bcat'+i);
-    if(amtEl){var v=parseFloat(amtEl.value);if(v>0)t.amount=v;}
-    if(catEl&&catEl.value&&catEl.value!=='__new__')t.category=catEl.value;
-  });
-  ti.forEach(function(t){
-    D.txns.push({id:Date.now()+Math.random(),type:t.type,amount:t.amount,category:t.category,note:t.note,date:t.date});
-    learnCat(t.note,t.category,t.type);
-  });
-  autoApplyAlloc();
-  sv();cMod('bulkOv');rHome();if(curPg==='goals')rGoals();
-  showToast('✅ '+ti.length+' transaction'+(ti.length>1?'s':'')+' imported!'+(dupSelected.length?' ('+dupSelected.length+' dup)':''));
-}
-
 // Single SMS confirm — also auto-dismiss
 function confSmsTxn(){
   var amt=parseFloat(document.getElementById('smsAmt').value);
