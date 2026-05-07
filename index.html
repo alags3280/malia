@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Malia"/>
 <meta name="theme-color" content="#5E3FD8"/>
-<title>Malia v3.0</title>
+<title>Malia v3.2</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -246,12 +246,12 @@ select.fi option{background:#fff}
 <div id="pg-home" class="pg on">
   <div class="home-hdr">
     <div>
-      <div class="home-greet">Welcome back 👋 <span style="font-size:10px;background:var(--vil);color:var(--vi);font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle;">v3.0</span></div>
+      <div class="home-greet">Welcome back 👋 <span style="font-size:10px;background:var(--vil);color:var(--vi);font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle;">v3.2</span></div>
       <div class="home-name">Hi, <span id="hName">Alags</span>! ⭐</div>
     </div>
     <div class="home-btns">
       <button class="home-pill sms" onclick="openSmsMod()">💬 SMS</button>
-      <button class="home-pill ico" onclick="document.getElementById('settingsOv').classList.add('on')">📱</button>
+      <button class="home-pill ico" onclick="document.getElementById('settingsOv').classList.add('on')" style="gap:5px;">⚙️ <span style="font-size:12px;font-weight:700;">Settings</span></button>
     </div>
   </div>
 
@@ -455,7 +455,35 @@ select.fi option{background:#fff}
 <!-- Toast notification -->
 <div id="toastBar" style="position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);background:#1C1C1E;color:#fff;font-size:13px;font-weight:600;padding:12px 24px;border-radius:99px;z-index:900;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.25);"></div>
 
-<!-- Category drill-down modal -->
+<!-- Reset Month Modal -->
+<div class="ov" id="resetMonthOv" onclick="cMod('resetMonthOv',event)">
+  <div class="modal">
+    <div class="mh"></div>
+    <div class="mt">Reset Month Data</div>
+    <div class="info-box">Select a month to delete all transactions recorded in that month. Goals, cards and categories are not affected.</div>
+    <div class="fg">
+      <label class="fl">Month</label>
+      <select class="fi" id="resetMo">
+        <option value="0">January</option><option value="1">February</option><option value="2">March</option>
+        <option value="3">April</option><option value="4">May</option><option value="5">June</option>
+        <option value="6">July</option><option value="7">August</option><option value="8">September</option>
+        <option value="9">October</option><option value="10">November</option><option value="11">December</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label class="fl">Year</label>
+      <input class="fi" type="number" id="resetYr" placeholder="2026" min="2020" max="2099"/>
+    </div>
+    <!-- Preview count -->
+    <div id="resetMonthPreview" style="background:var(--rdl);border-radius:12px;padding:12px 14px;margin-bottom:14px;display:none;">
+      <div style="font-size:13px;font-weight:700;color:var(--rd);" id="resetMonthCount"></div>
+      <div style="font-size:11px;color:var(--rd);margin-top:4px;" id="resetMonthDetail"></div>
+    </div>
+    <button onclick="previewResetMonth()" style="width:100%;background:var(--bg);border:1.5px solid var(--bd);color:var(--ink);font-family:'Inter',sans-serif;font-size:14px;font-weight:700;padding:13px;border-radius:12px;cursor:pointer;margin-bottom:8px;">Preview Transactions</button>
+    <button class="sbtn" style="background:#E65100;" onclick="confirmResetMonth()">Delete This Month</button>
+    <button class="cbtn" onclick="cMod('resetMonthOv')">Cancel</button>
+  </div>
+</div>
 <div class="ov" id="catDrillOv" onclick="cMod('catDrillOv',event)">
   <div class="modal" style="max-height:85vh;overflow-y:auto;">
     <div class="mh"></div>
@@ -473,7 +501,8 @@ select.fi option{background:#fff}
 </div>
 
 <!-- MODALS -->
-<div class="ov" id="txnOv" onclick="cMod('txnOv',event)"><div class="modal"><div class="mh"></div><div class="mt" id="txnMT">Add Transaction</div><div class="ttog"><button id="btnE" class="tb eon" onclick="setTT('e')">− Expense</button><button id="btnI" class="tb off" onclick="setTT('i')">+ Income</button></div><div class="fg"><label class="fl">Amount (AED)</label><input class="fi" type="number" id="tAmt" placeholder="0.00" min="0" step="0.01"/></div><div class="fg"><label class="fl">Category</label><select class="fi" id="tCat"></select></div><div class="fg"><label class="fl">Note</label><input class="fi" type="text" id="tNote" placeholder="e.g. Grocery shopping"/></div><div class="fg"><label class="fl">Date</label><input class="fi" type="date" id="tDate"/></div><button class="sbtn" id="txnSBtn" onclick="saveTxn()">Add Transaction</button><button class="cbtn" onclick="cMod('txnOv')">Cancel</button></div></div>
+<div class="ov" id="txnOv" onclick="cMod('txnOv',event)"><div class="modal"><div class="mh"></div><div class="mt" id="txnMT">Add Transaction</div><div class="ttog"><button id="btnE" class="tb eon" onclick="setTT('e')">− Expense</button><button id="btnI" class="tb off" onclick="setTT('i')">+ Income</button></div><div class="fg"><label class="fl">Amount (AED)</label><input class="fi" type="number" id="tAmt" placeholder="0.00" min="0" step="0.01"/></div><div class="fg"><label class="fl">Category</label><select class="fi" id="tCat"></select></div><div class="fg"><label class="fl">Note</label><input class="fi" type="text" id="tNote" placeholder="e.g. Grocery shopping"/></div><div class="fg"><label class="fl">Date</label><input class="fi" type="date" id="tDate"/></div>
+    <div class="fg"><label class="fl">Payment Source</label><select class="fi" id="tSource"><option value="">-- Select Source --</option><option value="ADCB Debit">🏦 ADCB Debit Card</option><option value="ADCB Credit">💳 ADCB Credit Card</option><option value="ENBD Debit">🏦 ENBD Debit Card</option><option value="ENBD Credit">💳 ENBD Credit Card</option><option value="Cash">💵 Cash</option><option value="Other">📌 Other</option></select></div><button class="sbtn" id="txnSBtn" onclick="saveTxn()">Add Transaction</button><button class="cbtn" onclick="cMod('txnOv')">Cancel</button></div></div>
 
 <div class="ov" id="goalOv" onclick="cMod('goalOv',event)"><div class="modal"><div class="mh"></div><div class="mt" id="goalMT">New Goal</div><div class="fg"><label class="fl">Emoji</label><div class="epg" id="eGrid"></div><div style="display:flex;align-items:center;gap:8px;"><div class="epv" id="ePrev">🎯</div><input class="fi" type="text" id="gEmoji" placeholder="Or type emoji" style="font-size:18px;" oninput="updEP(this.value)"/></div></div><div class="fg"><label class="fl">Goal Name</label><input class="fi" type="text" id="gName" placeholder="e.g. Emergency Fund"/></div><div class="fg"><label class="fl">Target (AED)</label><input class="fi" type="number" id="gTarget" placeholder="0.00" min="0"/></div><div class="fg"><label class="fl">Already Saved (AED)</label><input class="fi" type="number" id="gSaved" placeholder="0.00" min="0"/></div><div class="fg"><label class="fl">Deadline</label><input class="fi" type="date" id="gDl"/></div>
 <div class="fg"><label class="fl">Monthly Savings Allocation %</label><div style="display:flex;align-items:center;gap:10px;"><input class="fi" type="number" id="gAlloc" min="0" max="100" placeholder="0" style="font-size:22px;font-weight:800;color:var(--vi);text-align:center;width:90px;"/><span style="font-size:15px;font-weight:700;color:var(--vi);">%</span><span style="font-size:12px;color:var(--ink3);flex:1;">of monthly net savings pot goes to this goal</span></div></div>
@@ -525,7 +554,7 @@ select.fi option{background:#fff}
 
 <div class="ov" id="nameOv" onclick="cMod('nameOv',event)"><div class="modal"><div class="mh"></div><div class="mt">Edit Name</div><div class="fg"><label class="fl">Your Name</label><input class="fi" type="text" id="nameIn" placeholder="Your name"/></div><button class="sbtn" onclick="saveName()">Save</button><button class="cbtn" onclick="cMod('nameOv')">Cancel</button></div></div>
 
-<div class="ov" id="smsConfOv" onclick="cMod('smsConfOv',event)"><div class="modal"><div class="mh"></div><div class="mt">Confirm Transaction</div><div style="background:var(--gnl);border-radius:10px;padding:10px;margin-bottom:14px;font-size:12px;color:#1B8A3A;font-weight:500;">Extracted from SMS — please review before saving:</div><div class="ttog"><button id="smsE" class="tb eon" onclick="setSmsT('e')">− Expense</button><button id="smsI" class="tb off" onclick="setSmsT('i')">+ Income</button></div><div class="fg"><label class="fl">Amount (AED)</label><input class="fi" type="number" id="smsAmt" min="0" step="0.01"/></div><div class="fg"><label class="fl">Category</label><select class="fi" id="smsCat"></select></div><div class="fg"><label class="fl">Note</label><input class="fi" type="text" id="smsNote"/></div><div class="fg"><label class="fl">Date</label><input class="fi" type="date" id="smsDt"/></div><button class="sbtn" onclick="confSmsTxn()">Save Transaction</button><button class="cbtn" onclick="cMod('smsConfOv')">Cancel</button></div></div>
+<div class="ov" id="smsConfOv" onclick="cMod('smsConfOv',event)"><div class="modal"><div class="mh"></div><div class="mt">Confirm Transaction</div><div style="background:var(--gnl);border-radius:10px;padding:10px;margin-bottom:14px;font-size:12px;color:#1B8A3A;font-weight:500;">Extracted from SMS — please review before saving:</div><div class="ttog"><button id="smsE" class="tb eon" onclick="setSmsT('e')">− Expense</button><button id="smsI" class="tb off" onclick="setSmsT('i')">+ Income</button></div><div class="fg"><label class="fl">Amount (AED)</label><input class="fi" type="number" id="smsAmt" min="0" step="0.01"/></div><div class="fg"><label class="fl">Category</label><select class="fi" id="smsCat"></select></div><div class="fg"><label class="fl">Note</label><input class="fi" type="text" id="smsNote"/></div><div class="fg"><label class="fl">Date</label><input class="fi" type="date" id="smsDt"/></div><div class="fg"><label class="fl">Payment Source</label><select class="fi" id="smsSrc"><option value="">-- Select Source --</option><option value="ADCB Debit">🏦 ADCB Debit Card</option><option value="ADCB Credit">💳 ADCB Credit Card</option><option value="ENBD Debit">🏦 ENBD Debit Card</option><option value="ENBD Credit">💳 ENBD Credit Card</option><option value="Cash">💵 Cash</option><option value="Other">📌 Other</option></select></div><button class="sbtn" onclick="confSmsTxn()">Save Transaction</button><button class="cbtn" onclick="cMod('smsConfOv')">Cancel</button></div></div>
 
 <div class="ov" id="smsOv" onclick="cMod('smsOv',event)"><div class="modal" style="max-height:90vh;overflow-y:auto;"><div class="mh"></div><div class="mt">Bulk SMS Parser</div><div style="background:#E8F0FF;border-radius:12px;padding:12px;margin-bottom:14px;font-size:12px;color:#3B5BDB;line-height:1.6;"><b>How:</b> Open Messages → ADCB/ENBD → long press → Select More → copy all → paste below.</div><div class="fg"><label class="fl">Paste SMS Here</label><textarea class="fi" id="smsTxt" placeholder="Paste bank messages here..." style="height:110px;resize:none;font-size:12px;line-height:1.6;"></textarea></div><button class="sbtn" onclick="bulkParse()">Parse & Preview</button><button class="cbtn" onclick="cMod('smsOv')">Cancel</button></div></div>
 
@@ -551,7 +580,10 @@ select.fi option{background:#fff}
 <button onclick="setAccent('#0ea5e9','#e0f2fe')" class="sw-c" style="background:#0ea5e9;"></button>
 </div>
 <div style="font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;">Danger Zone</div>
-<button onclick="resetCats()" style="width:100%;background:var(--rdl);border:none;color:var(--rd);font-family:'Inter',sans-serif;font-size:14px;font-weight:700;padding:14px;border-radius:12px;cursor:pointer;">Reset Categories to Default</button>
+<button onclick="resetCats()" style="width:100%;background:var(--rdl);border:none;color:var(--rd);font-family:'Inter',sans-serif;font-size:14px;font-weight:700;padding:14px;border-radius:12px;cursor:pointer;margin-bottom:10px;">Reset Categories to Default</button>
+<button onclick="openResetMonthMod()" style="width:100%;background:#FFF3E0;border:none;color:#E65100;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;padding:14px;border-radius:12px;cursor:pointer;margin-bottom:10px;">🗓️ Reset a Specific Month</button>
+<button onclick="resetAllData()" style="width:100%;background:var(--rd);border:none;color:#fff;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;padding:14px;border-radius:12px;cursor:pointer;">🗑️ Reset ALL Data (Start Fresh)</button>
+<div style="font-size:11px;color:var(--ink3);margin-top:6px;text-align:center;">This will delete all transactions, goals, cards and categories permanently.</div>
 <button class="cbtn" onclick="cMod('settingsOv')">Close</button>
 </div></div>
 
@@ -991,8 +1023,10 @@ function rTxns(){
 }
 function tCardHtml(t){
   var ds=new Date(t.date+'T00:00:00').toLocaleDateString('en-AE',{day:'numeric',month:'short'});
+  var srcIco={'ADCB Debit':'🏦','ADCB Credit':'💳','ENBD Debit':'🏦','ENBD Credit':'💳','Cash':'💵','Other':'📌'};
+  var srcBadge=t.source?'<span style="font-size:10px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:1px 6px;color:var(--ink3);font-weight:600;margin-left:4px;">'+(srcIco[t.source]||'')+'&nbsp;'+t.source+'</span>':'';
   return '<div class="t-card"><div class="t-card-ico">'+getICO(t.category)+'</div>'
-    +'<div class="t-card-body"><div class="t-card-name">'+(t.note||t.category)+'</div>'
+    +'<div class="t-card-body"><div class="t-card-name">'+(t.note||t.category)+srcBadge+'</div>'
     +'<div class="t-card-cat">'+t.category+(txnSort!=='date'?' · '+ds:'')+'</div></div>'
     +'<div class="t-card-amt '+t.type+'">'+(t.type==='i'?'+':'-')+'AED '+fmt(t.amount)+'</div>'
     +'<button class="t-card-del" style="color:var(--vi);" onclick="editT('+t.id+')"><svg viewBox="0 0 24 24" style="stroke:var(--vi)"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>'
@@ -1007,7 +1041,7 @@ function editT(id){
   document.getElementById('tAmt').value=t.amount;
   document.getElementById('tNote').value=t.note||'';
   document.getElementById('tDate').value=t.date;
-  // Set category
+  document.getElementById('tSource').value=t.source||'';
   var sel=document.getElementById('tCat');
   for(var i=0;i<sel.options.length;i++){if(sel.options[i].value===t.category){sel.selectedIndex=i;break;}}
   document.getElementById('txnMT').textContent='Edit Transaction';
@@ -1115,13 +1149,14 @@ function openTxnMod(type){
   document.getElementById('tDate').value=td();
   document.getElementById('tAmt').value='';
   document.getElementById('tNote').value='';
+  document.getElementById('tSource').value='';
   setTT(type||'e');
   document.getElementById('txnOv').classList.add('on');
 }
 function setTT(t){tType=t;document.getElementById('btnE').className='tb '+(t==='e'?'eon':'off');document.getElementById('btnI').className='tb '+(t==='i'?'ion':'off');var sel=document.getElementById('tCat');sel.innerHTML=(t==='e'?D.ec:D.ic).map(function(c){var n=catName(c);return '<option value="'+n+'">'+emoLabel(c)+' '+n+'</option>';}).join('');}
 function saveTxn(){
   var amt=parseFloat(document.getElementById('tAmt').value);if(!amt||amt<=0)return;
-  var entry={type:tType,amount:amt,category:document.getElementById('tCat').value,note:document.getElementById('tNote').value.trim(),date:document.getElementById('tDate').value||td()};
+  var entry={type:tType,amount:amt,category:document.getElementById('tCat').value,note:document.getElementById('tNote').value.trim(),date:document.getElementById('tDate').value||td(),source:document.getElementById('tSource').value||''};
   if(editTxnId!==null){
     var idx=D.txns.findIndex(function(t){return t.id===editTxnId;});
     if(idx>=0){entry.id=editTxnId;D.txns[idx]=entry;}
@@ -1206,6 +1241,47 @@ function openEC(type,idx){eCT=type;eCI=idx;var c=(type==='exp'?D.ec:D.ic)[idx];v
 function saveCat(){var name=document.getElementById('catNm').value.trim(),em=document.getElementById('catEmo').value.trim()||'📌';if(!name)return;var entry=em+'|'+name;var cats=eCT==='exp'?D.ec:D.ic;if(eCI!==null)cats[eCI]=entry;else cats.push(entry);sv();cMod('catOv');rCats();setTT(tType);}
 function dCat(type,idx){var cats=type==='exp'?D.ec:D.ic;if(cats.length<=1){alert('Need at least one category.');return;}cats.splice(idx,1);sv();rCats();setTT(tType);}
 function resetCats(){if(!confirm('Reset to defaults?'))return;D.ec=DE.slice();D.ic=DI.slice();sv();rCats();setTT(tType);}
+function resetAllData(){
+  if(!confirm('This will delete ALL your transactions, goals, cards, and categories.\n\nAre you sure?'))return;
+  if(!confirm('FINAL WARNING — this cannot be undone.\n\nDelete everything and start fresh?'))return;
+  localStorage.removeItem('malia-v3');
+  localStorage.removeItem('malia-v2');
+  localStorage.removeItem('malia-v1');
+  localStorage.removeItem('malia-prof');
+  showToast('All data cleared. Restarting...');
+  setTimeout(function(){window.location.reload();},1200);
+}
+function openResetMonthMod(){
+  var n=new Date();
+  document.getElementById('resetMo').value=n.getMonth();
+  document.getElementById('resetYr').value=n.getFullYear();
+  document.getElementById('resetMonthPreview').style.display='none';
+  cMod('settingsOv');
+  setTimeout(function(){document.getElementById('resetMonthOv').classList.add('on');},200);
+}
+function previewResetMonth(){
+  var mo=parseInt(document.getElementById('resetMo').value);
+  var yr=parseInt(document.getElementById('resetYr').value)||new Date().getFullYear();
+  var MOS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var matching=D.txns.filter(function(t){var d=new Date(t.date);return d.getMonth()===mo&&d.getFullYear()===yr;});
+  var inc=matching.filter(function(t){return t.type==='i';}).reduce(function(a,t){return a+t.amount;},0);
+  var exp=matching.filter(function(t){return t.type==='e';}).reduce(function(a,t){return a+t.amount;},0);
+  var prev=document.getElementById('resetMonthPreview');
+  prev.style.display='block';
+  document.getElementById('resetMonthCount').textContent=matching.length+' transactions found in '+MOS[mo]+' '+yr;
+  document.getElementById('resetMonthDetail').textContent='Income: AED '+fmt(inc)+' · Expenses: AED '+fmt(exp);
+}
+function confirmResetMonth(){
+  var mo=parseInt(document.getElementById('resetMo').value);
+  var yr=parseInt(document.getElementById('resetYr').value)||new Date().getFullYear();
+  var MOS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var matching=D.txns.filter(function(t){var d=new Date(t.date);return d.getMonth()===mo&&d.getFullYear()===yr;});
+  if(!matching.length){alert('No transactions found for '+MOS[mo]+' '+yr);return;}
+  if(!confirm('Delete '+matching.length+' transactions from '+MOS[mo]+' '+yr+'?\n\nThis cannot be undone.'))return;
+  D.txns=D.txns.filter(function(t){var d=new Date(t.date);return !(d.getMonth()===mo&&d.getFullYear()===yr);});
+  autoApplyAlloc();sv();cMod('resetMonthOv');rHome();if(curPg==='transactions')rTxns();
+  showToast('✅ '+matching.length+' transactions deleted from '+MOS[mo]+' '+yr);
+}
 function openNameMod(){var p=JSON.parse(localStorage.getItem('malia-prof')||'{}');document.getElementById('nameIn').value=p.name||'Alags';document.getElementById('nameOv').classList.add('on');}
 function saveName(){var name=document.getElementById('nameIn').value.trim()||'Alags';sProf({name:name});document.getElementById('hName').textContent=name;document.getElementById('profNameD').textContent=name;cMod('nameOv');}
 
@@ -1228,7 +1304,14 @@ function pSms(txt){
   if(note&&D.catMemory){var mk=note.toLowerCase().trim().substring(0,30);var bk=Object.keys(D.catMemory).find(function(k){return D.catMemory[k].type===type&&(mk.indexOf(k.substring(0,Math.min(5,k.length)))>=0||k.indexOf(mk.substring(0,Math.min(5,mk.length)))>=0);});if(bk)cat=D.catMemory[bk].cat;}
   if(cat==='Other'&&note){var hc=getCatFromHistory(note,type);if(hc)cat=hc;}
   if(cat==='Other'){var keys=Object.keys(KW);if(type==='i'){for(var x=0;x<keys.length;x++){if(['Salary','Investment','Gift'].indexOf(keys[x])>=0&&KW[keys[x]].test(s)){cat=keys[x];break;}}}else{for(var y=0;y<keys.length;y++){if(KW[keys[y]].test(s)){cat=keys[y];break;}}}}
-  return{amount:amount,type:type,note:note,date:date,category:cat};}
+  // Detect payment source from SMS
+  var source='';
+  if(/ADCB/i.test(txt)){
+    source=/credit|card/i.test(txt)?'ADCB Credit':'ADCB Debit';
+  } else if(/ENBD|Emirates NBD/i.test(txt)){
+    source=/credit|card/i.test(txt)?'ENBD Credit':'ENBD Debit';
+  }
+  return{amount:amount,type:type,note:note,date:date,category:cat,source:source};}
 function isDup(p){
   return D.txns.some(function(t){
     return Math.abs(t.amount-p.amount)<0.01
@@ -1474,7 +1557,16 @@ function showCardTxns(id){
   document.getElementById('cardTxnOv').classList.add('on');
 }
 var smsTp='e';
-function showSmsConf(parsed){smsTp=parsed.type;setSmsT(parsed.type);document.getElementById('smsAmt').value=parsed.amount;document.getElementById('smsNote').value=parsed.note;document.getElementById('smsDt').value=parsed.date;var sel=document.getElementById('smsCat');for(var i=0;i<sel.options.length;i++){if(sel.options[i].value===parsed.category){sel.selectedIndex=i;break;}}document.getElementById('smsConfOv').classList.add('on');}
+function showSmsConf(parsed){
+  smsTp=parsed.type;setSmsT(parsed.type);
+  document.getElementById('smsAmt').value=parsed.amount;
+  document.getElementById('smsNote').value=parsed.note;
+  document.getElementById('smsDt').value=parsed.date;
+  document.getElementById('smsSrc').value=parsed.source||'';
+  var sel=document.getElementById('smsCat');
+  for(var i=0;i<sel.options.length;i++){if(sel.options[i].value===parsed.category){sel.selectedIndex=i;break;}}
+  document.getElementById('smsConfOv').classList.add('on');
+}
 function setSmsT(t){smsTp=t;document.getElementById('smsE').className='tb '+(t==='e'?'eon':'off');document.getElementById('smsI').className='tb '+(t==='i'?'ion':'off');var sel=document.getElementById('smsCat');sel.innerHTML=(t==='e'?D.ec:D.ic).map(function(c){var n=catName(c);return '<option value="'+n+'">'+n+'</option>';}).join('');}
 
 // Detect if SMS is a credit card transaction and which card it belongs to
@@ -1620,7 +1712,7 @@ function importBulk(){
   var ccCount=0;
   ti.forEach(function(t){
     // Add to main transactions
-    D.txns.push({id:Date.now()+Math.random(),type:t.type,amount:t.amount,category:t.category,note:t.note,date:t.date});
+    D.txns.push({id:Date.now()+Math.random(),type:t.type,amount:t.amount,category:t.category,note:t.note,date:t.date,source:t.source||''});
     learnCat(t.note,t.category,t.type);
     // If assigned to a card, also add as card spend
     if(t.type==='e'&&t.selectedCardId){
@@ -1665,7 +1757,8 @@ function confSmsTxn(){
   if(!amt||amt<=0)return;
   var note=document.getElementById('smsNote').value.trim();
   var cat=document.getElementById('smsCat').value;
-  D.txns.push({id:Date.now(),type:smsTp,amount:amt,category:cat,note:note,date:document.getElementById('smsDt').value||td()});
+  var source=document.getElementById('smsSrc').value||'';
+  D.txns.push({id:Date.now(),type:smsTp,amount:amt,category:cat,note:note,date:document.getElementById('smsDt').value||td(),source:source});
   learnCat(note,cat,smsTp);
   autoApplyAlloc();
   sv();cMod('smsConfOv');rHome();if(curPg==='goals')rGoals();
