@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Malia"/>
 <meta name="theme-color" content="#5E3FD8"/>
-<title>Malia v3.2</title>
+<title>Malia v3.3</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -246,7 +246,7 @@ select.fi option{background:#fff}
 <div id="pg-home" class="pg on">
   <div class="home-hdr">
     <div>
-      <div class="home-greet">Welcome back 👋 <span style="font-size:10px;background:var(--vil);color:var(--vi);font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle;">v3.2</span></div>
+      <div class="home-greet">Welcome back 👋 <span style="font-size:10px;background:var(--vil);color:var(--vi);font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle;">v3.3</span></div>
       <div class="home-name">Hi, <span id="hName">Alags</span>! ⭐</div>
     </div>
     <div class="home-btns">
@@ -426,6 +426,15 @@ select.fi option{background:#fff}
       <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </button>
   </div>
+  <!-- Upload statement button -->
+  <div style="padding:0 20px 14px;display:flex;gap:10px;">
+    <button onclick="document.getElementById('stmtFileIn').click()" style="flex:1;background:#E8F0FF;border:none;color:#1565c0;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;padding:12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">📄 Upload CC Statement (CSV/PDF text)</button>
+    <input type="file" id="stmtFileIn" accept=".csv,.txt" style="display:none;" onchange="handleStmtUpload(event)"/>
+  </div>
+  <!-- Opening bank balance -->
+  <div style="padding:0 20px 14px;">
+    <button onclick="openOpeningBalMod()" style="width:100%;background:var(--vil);border:none;color:var(--vi);font-family:'Inter',sans-serif;font-size:13px;font-weight:700;padding:12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">🏦 Set Opening Bank Balance</button>
+  </div>
   <!-- Summary bar -->
   <div style="display:flex;gap:10px;padding:0 20px 16px;" id="cardSummary"></div>
   <!-- Cards list -->
@@ -454,6 +463,44 @@ select.fi option{background:#fff}
 
 <!-- Toast notification -->
 <div id="toastBar" style="position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);background:#1C1C1E;color:#fff;font-size:13px;font-weight:600;padding:12px 24px;border-radius:99px;z-index:900;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.25);"></div>
+
+<!-- CC Statement Review Modal -->
+<div class="ov" id="stmtOv">
+  <div class="modal" style="max-height:92vh;overflow-y:auto;">
+    <div class="mh"></div>
+    <div class="mt">Statement Preview</div>
+    <div id="stmtInfo" style="margin-bottom:12px;"></div>
+    <div id="stmtWarn" style="display:none;background:#FFF3E0;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#E65100;font-weight:600;"></div>
+    <div id="stmtStats" style="display:flex;gap:8px;margin-bottom:12px;"></div>
+    <div id="stmtList" style="display:flex;flex-direction:column;gap:8px;max-height:45vh;overflow-y:auto;margin-bottom:14px;"></div>
+    <div style="display:flex;gap:8px;">
+      <button class="sbtn" style="flex:1;" onclick="importStatement(false)">Import New Only</button>
+      <button class="sbtn" style="flex:1;background:#E65100;" onclick="importStatement(true)">Overwrite All</button>
+    </div>
+    <button class="cbtn" onclick="cMod('stmtOv')">Cancel</button>
+  </div>
+</div>
+
+<!-- Opening Bank Balance Modal -->
+<div class="ov" id="openingBalOv" onclick="cMod('openingBalOv',event)">
+  <div class="modal">
+    <div class="mh"></div>
+    <div class="mt">Opening Bank Balance</div>
+    <div class="info-box">Set your bank balance as of a specific date. This will be recorded as an income entry under "Opening Balance" so your net balance starts correctly.</div>
+    <div class="fg"><label class="fl">Bank / Account</label>
+      <select class="fi" id="obBank">
+        <option value="ADCB">🏦 ADCB</option>
+        <option value="ENBD">🏦 ENBD</option>
+        <option value="Other">🏦 Other Bank</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">Opening Balance (AED)</label><input class="fi" type="number" id="obAmt" placeholder="0.00" min="0" step="0.01"/></div>
+    <div class="fg"><label class="fl">As of Date</label><input class="fi" type="date" id="obDate"/></div>
+    <div id="obExisting" style="display:none;background:#FFF3E0;border-radius:10px;padding:10px;margin-bottom:12px;font-size:12px;color:#E65100;font-weight:600;"></div>
+    <button class="sbtn" onclick="saveOpeningBal()">Set Opening Balance</button>
+    <button class="cbtn" onclick="cMod('openingBalOv')">Cancel</button>
+  </div>
+</div>
 
 <!-- Reset Month Modal -->
 <div class="ov" id="resetMonthOv" onclick="cMod('resetMonthOv',event)">
@@ -645,8 +692,8 @@ select.fi option{background:#fff}
 var S='malia-v3',SFROM='2026-04-01';
 var MOS3=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 var DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-var DE=['Food & Dining','Transport','Shopping','Bills & Utilities','Entertainment','Health','Education','Rent','Other'];
-var DI=['Salary','Freelance','Investment','Gift','Rental','Other'];
+var DE=['Food & Dining','Transport','Shopping','Bills & Utilities','Entertainment','Health','Education','Rent','Credit Card Payment','Other'];
+var DI=['Salary','Freelance','Investment','Gift','Rental','Opening Balance','Other'];
 var GEM=['🎯','✈️','🏠','🚗','💍','📱','💻','🎓','👶','🏖️','⛵','🏋️','🎸','📷','🛍️','💰','🏦','🌍','🎁','🏥','🐾','🍽️','☕','🧳','🎬','🏕️','🚀','💎','🌱','🎉'];
 var ICO={'Food & Dining':'🍕','Transport':'🚗','Shopping':'🛍️','Housing':'🏠','Health':'🏥','Entertainment':'🎬','Bills & Utilities':'⚡','Bills':'⚡','Education':'📚','Salary':'💰','Freelance':'💻','Investment':'📈','Gift':'🎁','Rental':'🏢','Rent':'🏡','Other':'📌'};
 var KW={'Food & Dining':/carrefour|lulu|spinneys|restaurant|cafe|coffee|mcdonald|kfc|pizza|burger|food|dining|talabat|deliveroo|zomato|starbucks/i,'Transport':/uber|careem|taxi|petrol|fuel|enoc|adnoc|parking|salik|rta|bus|metro/i,'Shopping':/mall|shop|boutique|zara|nike|adidas|amazon|noon|namshi|fashion|store|ikea/i,'Health':/pharmacy|hospital|clinic|doctor|dental|medical|health|chemist|aster|nmc/i,'Entertainment':/cinema|netflix|spotify|itunes|playstation|game|movie|vox|youtube|disney/i,'Bills & Utilities':/etisalat|du|telecom|internet|phone|bill|utility|electric|water|insurance|dewa|addc/i,'Education':/school|university|college|tuition|course|education/i,'Rent':/rent|housing|villa|apartment/i,'Salary':/salary|payroll|wages/i,'Investment':/dividend|interest|investment|profit/i,'Gift':/gift|received from/i};
@@ -1240,6 +1287,169 @@ function openCatMod(type){eCT=type;eCI=null;document.getElementById('catMT').tex
 function openEC(type,idx){eCT=type;eCI=idx;var c=(type==='exp'?D.ec:D.ic)[idx];var p=c.split('|');document.getElementById('catMT').textContent='Edit Category';document.getElementById('catSBtn').textContent='Save Changes';document.getElementById('catEmo').value=p.length>1?p[0]:'';document.getElementById('catNm').value=p.length>1?p[1]:p[0];document.getElementById('catOv').classList.add('on');}
 function saveCat(){var name=document.getElementById('catNm').value.trim(),em=document.getElementById('catEmo').value.trim()||'📌';if(!name)return;var entry=em+'|'+name;var cats=eCT==='exp'?D.ec:D.ic;if(eCI!==null)cats[eCI]=entry;else cats.push(entry);sv();cMod('catOv');rCats();setTT(tType);}
 function dCat(type,idx){var cats=type==='exp'?D.ec:D.ic;if(cats.length<=1){alert('Need at least one category.');return;}cats.splice(idx,1);sv();rCats();setTT(tType);}
+// ── OPENING BANK BALANCE ──
+function openOpeningBalMod(){
+  document.getElementById('obDate').value=td();
+  document.getElementById('obAmt').value='';
+  var existing=D.txns.filter(function(t){return t.category==='Opening Balance';});
+  var obEx=document.getElementById('obExisting');
+  if(existing.length){obEx.style.display='block';obEx.textContent='⚠️ '+existing.length+' opening balance entry already exists. Saving will add another.';}
+  else{obEx.style.display='none';}
+  if(D.ic.indexOf('Opening Balance')<0&&D.ic.indexOf('🏦|Opening Balance')<0)D.ic.push('🏦|Opening Balance');
+  document.getElementById('openingBalOv').classList.add('on');
+}
+function saveOpeningBal(){
+  var amt=parseFloat(document.getElementById('obAmt').value);
+  if(!amt||amt<=0)return;
+  var bank=document.getElementById('obBank').value;
+  var date=document.getElementById('obDate').value||td();
+  D.txns.push({id:Date.now(),type:'i',amount:amt,category:'Opening Balance',note:bank+' Opening Balance',date:date,source:bank+' Debit'});
+  if(D.ic.indexOf('🏦|Opening Balance')<0&&D.ic.indexOf('Opening Balance')<0)D.ic.push('🏦|Opening Balance');
+  autoApplyAlloc();sv();cMod('openingBalOv');rHome();
+  showToast('✅ Opening balance of AED '+fmt(amt)+' set');
+}
+
+// ── CC STATEMENT UPLOAD ──
+var stmtParsed=[];
+function handleStmtUpload(e){
+  var file=e.target.files[0];if(!file)return;
+  e.target.value='';
+  var reader=new FileReader();
+  reader.onload=function(ev){parseStatement(ev.target.result,file.name);};
+  reader.readAsText(file);
+}
+function parseStatement(text,filename){
+  var lines=text.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});
+  stmtParsed=[];
+  var cardName=filename.replace(/\.[^.]+$/,'').replace(/_/g,' ');
+  var headerIdx=-1,dateCol=-1,descCol=-1,amtCol=-1,crCol=-1;
+  for(var i=0;i<Math.min(10,lines.length);i++){
+    var low=lines[i].toLowerCase();
+    if(low.indexOf('date')>=0&&(low.indexOf('amount')>=0||low.indexOf('debit')>=0||low.indexOf('credit')>=0)){
+      headerIdx=i;
+      var headers=splitCSV(lines[i]);
+      headers.forEach(function(h,idx){
+        var hl=h.toLowerCase().trim().replace(/^"|"$/g,'');
+        if(/^(date|transaction date|value date|trans date|posting date)$/.test(hl))dateCol=idx;
+        if(/^(description|narration|particulars|transaction description|details|merchant|remarks)$/.test(hl))descCol=idx;
+        if(/^(amount|transaction amount|debit|debit amount|withdrawal)$/.test(hl))amtCol=idx;
+        if(/^(credit|credit amount|deposit)$/.test(hl))crCol=idx;
+      });
+      break;
+    }
+  }
+  if(headerIdx<0){alert('Could not detect statement format. Please ensure CSV has Date, Description, Amount columns.');return;}
+  for(var j=headerIdx+1;j<lines.length;j++){
+    var cols=splitCSV(lines[j]);
+    if(cols.length<2)continue;
+    var dateStr=dateCol>=0?(cols[dateCol]||'').replace(/^"|"$/g,''):'';
+    var desc=descCol>=0?(cols[descCol]||'').replace(/^"|"$/g,'').trim():'';
+    var amtStr=amtCol>=0?(cols[amtCol]||'0').replace(/^"|"$/g,''):'0';
+    var crStr=crCol>=0?(cols[crCol]||'').replace(/^"|"$/g,''):'';
+    var amt=parseFloat(amtStr.replace(/[^0-9.\-]/g,''))||0;
+    var cr=parseFloat(crStr.replace(/[^0-9.\-]/g,''))||0;
+    if(!desc&&!dateStr)continue;
+    if(Math.abs(amt)<0.01&&Math.abs(cr)<0.01)continue;
+    var parsedDate=parseStmtDate(dateStr);
+    if(!parsedDate)continue;
+    var type='e';
+    if(cr>0&&amt<=0){type='i';amt=cr;}
+    else if(amt<0){type='i';amt=Math.abs(amt);}
+    // Auto-categorise: history first, then keywords, then create new
+    var cat=getCatFromHistory(desc,type)||'';
+    if(!cat){
+      var sl=desc.toLowerCase();
+      var keys=Object.keys(KW);
+      if(type==='i'){for(var x=0;x<keys.length;x++){if(KW[keys[x]].test(sl)){cat=keys[x];break;}}}
+      else{for(var y=0;y<keys.length;y++){if(KW[keys[y]].test(sl)){cat=keys[y];break;}}}
+    }
+    if(!cat){
+      // Create category from description (first 2 words, max 20 chars)
+      var newCatName=desc.replace(/[^a-zA-Z\s]/g,'').trim().split(/\s+/).slice(0,2).join(' ').substring(0,20);
+      if(newCatName.length>=3){
+        cat=newCatName;
+        var catEntry='🏷️|'+cat;
+        var catList=type==='i'?D.ic:D.ec;
+        if(catList.indexOf(catEntry)<0&&catList.indexOf(cat)<0)catList.push(catEntry);
+      } else {cat='Other';}
+    }
+    var dup=isDup({amount:amt,date:parsedDate,type:type,category:cat});
+    stmtParsed.push({amount:amt,type:type,note:desc,date:parsedDate,category:cat,source:cardName,sel:true,isDup:dup});
+  }
+  if(!stmtParsed.length){alert('No valid transactions found. Check file format.');return;}
+  sv();showStmtReview(cardName);
+}
+function splitCSV(line){
+  var result=[],current='',inQ=false;
+  for(var i=0;i<line.length;i++){
+    var c=line[i];
+    if(c==='"'){inQ=!inQ;}
+    else if(c===','&&!inQ){result.push(current);current='';}
+    else{current+=c;}
+  }
+  result.push(current);
+  return result;
+}
+function parseStmtDate(s){
+  if(!s)return null;
+  s=s.trim();
+  var m,mo3={jan:'01',feb:'02',mar:'03',apr:'04',may:'05',jun:'06',jul:'07',aug:'08',sep:'09',oct:'10',nov:'11',dec:'12'};
+  m=s.match(/^(\d{4})[\/\-](\d{2})[\/\-](\d{2})$/);if(m)return m[1]+'-'+m[2]+'-'+m[3];
+  m=s.match(/^(\d{2})[\/\-](\d{2})[\/\-](\d{4})$/);if(m)return m[3]+'-'+m[2]+'-'+m[1];
+  m=s.match(/^(\d{1,2})[\s\-]([A-Za-z]{3})[\s\-](\d{4})$/);if(m&&mo3[m[2].toLowerCase()])return m[3]+'-'+mo3[m[2].toLowerCase()]+'-'+m[1].padStart(2,'0');
+  m=s.match(/^([A-Za-z]{3})\s+(\d{1,2}),?\s+(\d{4})$/);if(m&&mo3[m[1].toLowerCase()])return m[3]+'-'+mo3[m[1].toLowerCase()]+'-'+m[2].padStart(2,'0');
+  return null;
+}
+function showStmtReview(cardName){
+  var newT=stmtParsed.filter(function(t){return !t.isDup;});
+  var dupT=stmtParsed.filter(function(t){return t.isDup;});
+  var totalExp=stmtParsed.filter(function(t){return t.type==='e';}).reduce(function(a,t){return a+t.amount;},0);
+  document.getElementById('stmtInfo').innerHTML='<div style="font-size:14px;font-weight:700;">📄 '+cardName+'</div><div style="font-size:12px;color:var(--ink2);margin-top:3px;">'+stmtParsed.length+' transactions found</div>';
+  document.getElementById('stmtStats').innerHTML=
+    '<div style="flex:1;background:var(--gnl);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;font-weight:700;color:#1B8A3A;">NEW</div><div style="font-size:18px;font-weight:800;color:#1B8A3A;">'+newT.length+'</div></div>'
+    +(dupT.length?'<div style="flex:1;background:#FFF3E0;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;font-weight:700;color:#E65100;">DUPES</div><div style="font-size:18px;font-weight:800;color:#E65100;">'+dupT.length+'</div></div>':'')
+    +'<div style="flex:1;background:var(--rdl);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;font-weight:700;color:var(--rd);">TOTAL SPEND</div><div style="font-size:13px;font-weight:800;color:var(--rd);">AED '+fmt(totalExp)+'</div></div>';
+  var warn=document.getElementById('stmtWarn');
+  if(dupT.length){warn.style.display='block';warn.textContent='⚠️ '+dupT.length+' duplicate'+(dupT.length>1?'s':'')+' found — use "Import New Only" to skip, or "Overwrite All" to replace.';}
+  else{warn.style.display='none';}
+  document.getElementById('stmtList').innerHTML=stmtParsed.map(function(t,i){
+    var bg=t.isDup?'#FFFBF5':'var(--card)';
+    var border=t.isDup?'#FFB74D':'var(--bd)';
+    var cats=t.type==='i'?D.ic:D.ec;
+    var catOpts=cats.map(function(c){var n=catName(c);return '<option value="'+n+'"'+(n===t.category?' selected':'')+'>'+n+'</option>';}).join('');
+    return '<div style="background:'+bg+';border:1.5px solid '+border+';border-radius:12px;padding:12px;">'
+      +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">'
+      +'<input type="checkbox" '+(t.sel?'checked':'')+' onchange="stmtParsed['+i+'].sel=this.checked" style="width:16px;height:16px;accent-color:var(--vi);cursor:pointer;flex-shrink:0;"/>'
+      +'<span class="pill '+(t.type==='i'?'pill-g':'pill-r')+'">'+(t.type==='i'?'+':'-')+'</span>'
+      +(t.isDup?'<span style="background:#FFB74D;color:#7A3800;font-size:9px;font-weight:700;padding:2px 6px;border-radius:99px;">DUP</span>':'')
+      +'<span style="flex:1;font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+t.note+'</span>'
+      +'<span style="font-size:12px;font-weight:700;color:'+(t.type==='i'?'var(--gn)':'var(--rd)')+';white-space:nowrap;">'+'AED '+fmt(t.amount)+'</span>'
+      +'</div>'
+      +'<div style="display:flex;align-items:center;gap:6px;">'
+      +'<span style="font-size:11px;color:var(--ink3);flex-shrink:0;">'+t.date+'</span>'
+      +'<select onchange="stmtParsed['+i+'].category=this.value" style="flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:5px 8px;font-size:11px;color:var(--vi);font-family:Inter,sans-serif;outline:none;">'+catOpts+'</select>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+  document.getElementById('stmtOv').classList.add('on');
+}
+function importStatement(overwrite){
+  var toImport=stmtParsed.filter(function(t){return t.sel;});
+  if(!toImport.length){alert('Nothing selected.');return;}
+  if(!overwrite){toImport=toImport.filter(function(t){return !t.isDup;});}
+  else{
+    stmtParsed.filter(function(t){return t.sel&&t.isDup;}).forEach(function(t){
+      D.txns=D.txns.filter(function(ex){return !(Math.abs(ex.amount-t.amount)<0.01&&ex.date===t.date&&ex.type===t.type&&ex.category===t.category);});
+    });
+  }
+  toImport.forEach(function(t){
+    D.txns.push({id:Date.now()+Math.random(),type:t.type,amount:t.amount,category:t.category,note:t.note,date:t.date,source:t.source||''});
+    learnCat(t.note,t.category,t.type);
+  });
+  autoApplyAlloc();sv();cMod('stmtOv');rHome();if(curPg==='transactions')rTxns();
+  showToast('✅ '+toImport.length+' transactions imported from statement!');
+}
+
 function resetCats(){if(!confirm('Reset to defaults?'))return;D.ec=DE.slice();D.ic=DI.slice();sv();rCats();setTT(tType);}
 function resetAllData(){
   if(!confirm('This will delete ALL your transactions, goals, cards, and categories.\n\nAre you sure?'))return;
