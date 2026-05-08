@@ -7,8 +7,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Malia"/>
 <meta name="theme-color" content="#5E3FD8"/>
-<title>Malia v3.3</title>
+<title>Malia v3.4</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 :root{
   --bg:#F2F2F7;--card:#FFFFFF;--ink:#1C1C1E;--ink2:#636366;--ink3:#AEAEB2;
@@ -246,7 +247,7 @@ select.fi option{background:#fff}
 <div id="pg-home" class="pg on">
   <div class="home-hdr">
     <div>
-      <div class="home-greet">Welcome back 👋 <span style="font-size:10px;background:var(--vil);color:var(--vi);font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle;">v3.3</span></div>
+      <div class="home-greet">Welcome back 👋 <span style="font-size:10px;background:var(--vil);color:var(--vi);font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle;">v3.4</span></div>
       <div class="home-name">Hi, <span id="hName">Alags</span>! ⭐</div>
     </div>
     <div class="home-btns">
@@ -428,8 +429,8 @@ select.fi option{background:#fff}
   </div>
   <!-- Upload statement button -->
   <div style="padding:0 20px 14px;display:flex;gap:10px;">
-    <button onclick="document.getElementById('stmtFileIn').click()" style="flex:1;background:#E8F0FF;border:none;color:#1565c0;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;padding:12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">📄 Upload CC Statement (CSV/PDF text)</button>
-    <input type="file" id="stmtFileIn" accept=".csv,.txt" style="display:none;" onchange="handleStmtUpload(event)"/>
+    <button onclick="document.getElementById('stmtFileIn').click()" style="flex:1;background:#E8F0FF;border:none;color:#1565c0;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;padding:12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">📄 Upload CC Statement (CSV / PDF)</button>
+    <input type="file" id="stmtFileIn" accept=".csv,.txt,.pdf" style="display:none;" onchange="handleStmtUpload(event)"/>
   </div>
   <!-- Opening bank balance -->
   <div style="padding:0 20px 14px;">
@@ -1314,9 +1315,56 @@ var stmtParsed=[];
 function handleStmtUpload(e){
   var file=e.target.files[0];if(!file)return;
   e.target.value='';
-  var reader=new FileReader();
-  reader.onload=function(ev){parseStatement(ev.target.result,file.name);};
-  reader.readAsText(file);
+  var ext=file.name.split('.').pop().toLowerCase();
+  if(ext==='pdf'){
+    // Use PDF.js to extract text
+    showToast('⏳ Reading PDF...');
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      var typedArray=new Uint8Array(ev.target.result);
+      // Set worker
+      if(typeof pdfjsLib!=='undefined'){
+        pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        pdfjsLib.getDocument({data:typedArray}).promise.then(function(pdf){
+          var allText='';
+          var pagePromises=[];
+          for(var p=1;p<=pdf.numPages;p++){
+            pagePromises.push(pdf.getPage(p).then(function(page){
+              return page.getTextContent().then(function(tc){
+                // Sort items by y position then x to maintain row order
+                var items=tc.items.slice().sort(function(a,b){
+                  var yDiff=Math.round(b.transform[5])-Math.round(a.transform[5]);
+                  return yDiff!==0?yDiff:a.transform[4]-b.transform[4];
+                });
+                // Group into lines by y position
+                var lines={};
+                items.forEach(function(item){
+                  var y=Math.round(item.transform[5]);
+                  if(!lines[y])lines[y]=[];
+                  lines[y].push(item.str);
+                });
+                return Object.keys(lines).sort(function(a,b){return b-a;}).map(function(y){return lines[y].join(' ');}).join('\n');
+              });
+            }));
+          }
+          Promise.all(pagePromises).then(function(pages){
+            allText=pages.join('\n');
+            parsePDFStatement(allText,file.name);
+          });
+        }).catch(function(err){
+          alert('Could not read PDF: '+err.message+'\n\nTry exporting your statement as CSV instead.');
+        });
+      } else {
+        alert('PDF reader not loaded yet. Please try again in a moment.');
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  } else {
+    // CSV / TXT
+    var reader2=new FileReader();
+    reader2.onload=function(ev){parseStatement(ev.target.result,file.name);};
+    reader2.readAsText(file);
+  }
 }
 function parseStatement(text,filename){
   var lines=text.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});
@@ -1377,6 +1425,76 @@ function parseStatement(text,filename){
     stmtParsed.push({amount:amt,type:type,note:desc,date:parsedDate,category:cat,source:cardName,sel:true,isDup:dup});
   }
   if(!stmtParsed.length){alert('No valid transactions found. Check file format.');return;}
+  sv();showStmtReview(cardName);
+}
+function parsePDFStatement(text,filename){
+  // PDF text is extracted line by line — try to detect transaction rows
+  // Common pattern: date + description + amount on same or adjacent lines
+  var lines=text.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});
+  stmtParsed=[];
+  var cardName=filename.replace(/\.[^.]+$/,'').replace(/_/g,' ');
+
+  // Date pattern
+  var dateRe=/\b(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}|\d{1,2}\s+[A-Za-z]{3}\s+\d{4}|[A-Za-z]{3}\s+\d{1,2},?\s+\d{4})\b/;
+  // Amount pattern — numbers with decimals, possibly with commas
+  var amtRe=/\b(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\b/g;
+
+  lines.forEach(function(line){
+    var dateMatch=line.match(dateRe);
+    if(!dateMatch)return;
+    var parsedDate=parseStmtDate(dateMatch[1]);
+    if(!parsedDate)return;
+
+    // Extract all amounts from line — take last one as the transaction amount
+    var amounts=[];
+    var m;
+    amtRe.lastIndex=0;
+    while((m=amtRe.exec(line))!==null){
+      var v=parseFloat(m[1].replace(/,/g,''));
+      if(v>0&&v<999999)amounts.push(v);
+    }
+    if(!amounts.length)return;
+    var amt=amounts[amounts.length-1];
+
+    // Description = line minus date and amount
+    var desc=line
+      .replace(dateRe,'')
+      .replace(/\b\d{1,3}(?:,\d{3})*(?:\.\d{2})?\b/g,'')
+      .replace(/[\/\-]/g,' ')
+      .replace(/\s+/g,' ')
+      .trim();
+    if(desc.length<2)desc='Transaction';
+
+    // Detect CR/DR
+    var type='e';
+    if(/CR|credit|refund|reversal|payment|deposit/i.test(line))type='i';
+
+    // Categorise
+    var cat=getCatFromHistory(desc,type)||'';
+    if(!cat){
+      var sl=(line+' '+desc).toLowerCase();
+      var keys=Object.keys(KW);
+      if(type==='i'){for(var x=0;x<keys.length;x++){if(KW[keys[x]].test(sl)){cat=keys[x];break;}}}
+      else{for(var y=0;y<keys.length;y++){if(KW[keys[y]].test(sl)){cat=keys[y];break;}}}
+    }
+    if(!cat){
+      var newCatName=desc.replace(/[^a-zA-Z\s]/g,'').trim().split(/\s+/).slice(0,2).join(' ').substring(0,20);
+      if(newCatName.length>=3){
+        cat=newCatName;
+        var catEntry='🏷️|'+cat;
+        var catList=type==='i'?D.ic:D.ec;
+        if(catList.indexOf(catEntry)<0&&catList.indexOf(cat)<0)catList.push(catEntry);
+      } else {cat='Other';}
+    }
+
+    var dup=isDup({amount:amt,date:parsedDate,type:type,category:cat});
+    stmtParsed.push({amount:amt,type:type,note:desc,date:parsedDate,category:cat,source:cardName,sel:true,isDup:dup});
+  });
+
+  if(!stmtParsed.length){
+    alert('Could not extract transactions from PDF.\n\nTip: Some bank PDFs are image-based (scanned) and cannot be read as text. Try downloading your statement as CSV/Excel instead.');
+    return;
+  }
   sv();showStmtReview(cardName);
 }
 function splitCSV(line){
