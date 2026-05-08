@@ -2226,6 +2226,8 @@ function openCatDrill(cat,type){
 function rReports(){
   var mo=rptMo,yr=rptYr;
   document.getElementById('rptMoLbl').textContent=MOS3[mo]+' '+yr;
+
+  // Build last 6 months in correct chronological order
   var months=[];
   for(var i=5;i>=0;i--){
     var m=mo-i,y=yr;
@@ -2233,16 +2235,49 @@ function rReports(){
     var txns=moT(m,y);
     var inc=txns.filter(function(t){return t.type==='i';}).reduce(function(a,t){return a+t.amount;},0);
     var exp=txns.filter(function(t){return t.type==='e';}).reduce(function(a,t){return a+t.amount;},0);
-    months.push({lbl:MOS3[m],inc:inc,exp:exp});
+    months.push({lbl:MOS3[m],inc:inc,exp:exp,mo:m,yr:y});
   }
+
+  // Clear canvases first to avoid stale renders
+  ['rptBarChart','rptExpDonut','rptIncDonut'].forEach(function(id){
+    var cv=document.getElementById(id);
+    if(cv){var ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);}
+  });
+
   drawBarChart('rptBarChart',months);
+
+  // Selected month transactions
   var selTxns=moT(mo,yr);
+
+  // Expense donut
   var catExp={};
-  selTxns.filter(function(t){return t.type==='e';}).forEach(function(t){catExp[t.category]=(catExp[t.category]||0)+t.amount;});
+  selTxns.filter(function(t){return t.type==='e';}).forEach(function(t){
+    var cat=t.category||'Other';
+    catExp[cat]=(catExp[cat]||0)+t.amount;
+  });
   drawDonutFull('rptExpDonut','rptExpDonutLegend',catExp);
+
+  // Income donut
   var catInc={};
-  selTxns.filter(function(t){return t.type==='i';}).forEach(function(t){catInc[t.category]=(catInc[t.category]||0)+t.amount;});
+  selTxns.filter(function(t){return t.type==='i';}).forEach(function(t){
+    var cat=t.category||'Other';
+    catInc[cat]=(catInc[cat]||0)+t.amount;
+  });
   drawDonutFull('rptIncDonut','rptIncDonutLegend',catInc);
+
+  // Show totals for selected month
+  var totInc=selTxns.filter(function(t){return t.type==='i';}).reduce(function(a,t){return a+t.amount;},0);
+  var totExp=selTxns.filter(function(t){return t.type==='e';}).reduce(function(a,t){return a+t.amount;},0);
+  var summEl=document.getElementById('rptMoSummary');
+  if(summEl){
+    summEl.innerHTML=(selTxns.length?
+      '<div style="display:flex;gap:8px;padding:0 20px 8px;">'
+      +'<div style="flex:1;background:var(--gnl);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;font-weight:700;color:#1B8A3A;">INCOME</div><div style="font-size:15px;font-weight:800;color:#1B8A3A;">AED '+fmt(totInc)+'</div></div>'
+      +'<div style="flex:1;background:var(--rdl);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;font-weight:700;color:var(--rd);">EXPENSES</div><div style="font-size:15px;font-weight:800;color:var(--rd);">AED '+fmt(totExp)+'</div></div>'
+      +'<div style="flex:1;background:var(--bg);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;font-weight:700;color:var(--ink3);">NET</div><div style="font-size:15px;font-weight:800;color:'+(totInc-totExp>=0?'var(--gn)':'var(--rd)')+';">AED '+fmt(totInc-totExp)+'</div></div>'
+      +'</div>'
+      :'<div style="padding:0 20px 8px;font-size:13px;color:var(--ink3);">No transactions for '+MOS3[mo]+' '+yr+'</div>');
+  }
 }
 
 // ── VIEWPORT & KEYBOARD FIXES ──
