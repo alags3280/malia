@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Malia"/>
 <meta name="theme-color" content="#5E3FD8"/>
-<title>Malia v3.5</title>
+<title>Malia v3.6</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -247,7 +247,7 @@ select.fi option{background:#fff}
 <div id="pg-home" class="pg on">
   <div class="home-hdr">
     <div>
-      <div class="home-greet">Welcome back 👋 <span style="font-size:10px;background:var(--vil);color:var(--vi);font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle;">v3.5</span></div>
+      <div class="home-greet">Welcome back 👋 <span style="font-size:10px;background:var(--vil);color:var(--vi);font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle;">v3.6</span></div>
       <div class="home-name">Hi, <span id="hName">Alags</span>! ⭐</div>
     </div>
     <div class="home-btns">
@@ -2206,20 +2206,56 @@ function drawDonutFull(canvasId,legendId,catData){
   ctx.fillStyle='#1C1C1E';ctx.font='bold 9px Inter,sans-serif';ctx.textAlign='center';ctx.fillText('TOTAL',70,67);
   ctx.fillStyle='#5E3FD8';ctx.font='bold 10px Inter,sans-serif';ctx.fillText('AED '+total.toLocaleString('en-AE',{maximumFractionDigits:0}),70,80);
 
-  // Show ALL entries in legend (scrollable)
+  // Show ALL entries in legend (scrollable) with trend vs previous month
   if(legendEl){
     var type=legendId.indexOf('Inc')>=0?'i':'e';
-    legendEl.innerHTML='<div style="max-height:200px;overflow-y:auto;">'
+
+    // Build previous month category totals
+    var prevMo=rptMo-1,prevYr=rptYr;
+    if(prevMo<0){prevMo=11;prevYr--;}
+    var prevTxns=moT(prevMo,prevYr).filter(function(t){return t.type===type;});
+    var prevCats={};
+    prevTxns.forEach(function(t){prevCats[t.category]=(prevCats[t.category]||0)+t.amount;});
+
+    legendEl.innerHTML='<div style="max-height:220px;overflow-y:auto;">'
       +entries.map(function(e,i){
-        return '<div onclick="openCatDrill(\''+e[0].replace(/'/g,"\\'")+'\',' + "'"+type+"'" + ')" style="display:flex;align-items:center;gap:6px;margin-bottom:6px;cursor:pointer;padding:5px 8px;border-radius:10px;" onmouseover="this.style.background=\'var(--bg)\'" onmouseout="this.style.background=\'transparent\'">'
-          +'<span style="width:9px;height:9px;border-radius:2px;background:'+CHART_COLORS[i%CHART_COLORS.length]+';flex-shrink:0;display:inline-block;"></span>'
+        var prevAmt=prevCats[e[0]]||0;
+        var diff=e[1]-prevAmt;
+        var pct=prevAmt>0?((diff/prevAmt)*100):0;
+        // Trend badge
+        var trendHtml='';
+        if(prevAmt>0){
+          var isUp=diff>0;
+          // For expenses: up = bad (red), down = good (green)
+          // For income: up = good (green), down = bad (red)
+          var upBad=(type==='e');
+          var trendColor=isUp?(upBad?'#FF3B30':'#34C759'):(upBad?'#34C759':'#FF3B30');
+          var trendBg=isUp?(upBad?'#FFF0EF':'#E8F8ED'):(upBad?'#E8F8ED':'#FFF0EF');
+          var arrow=isUp?'↑':'↓';
+          trendHtml='<span style="font-size:10px;font-weight:800;color:'+trendColor+';background:'+trendBg+';padding:2px 6px;border-radius:6px;white-space:nowrap;flex-shrink:0;">'+arrow+Math.abs(pct).toFixed(0)+'%</span>';
+        } else if(e[1]>0){
+          // New this month
+          trendHtml='<span style="font-size:9px;font-weight:700;color:var(--vi);background:var(--vil);padding:2px 6px;border-radius:6px;flex-shrink:0;">NEW</span>';
+        }
+
+        return '<div onclick="openCatDrill(\''+e[0].replace(/'/g,"\\'")+'\',' + "'"+type+"'" + ')" style="display:flex;align-items:center;gap:6px;margin-bottom:6px;cursor:pointer;padding:5px 8px;border-radius:10px;transition:background .15s;" onmouseover="this.style.background=\'var(--bg)\'" onmouseout="this.style.background=\'transparent\'">'
+          +'<span style="width:9px;height:9px;border-radius:2px;background:'+CHART_COLORS[i%CHART_COLORS.length]+';flex-shrink:0;display:inline-block;margin-top:1px;"></span>'
           +'<div style="flex:1;min-width:0;">'
           +'<div style="font-size:12px;color:#1C1C1E;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+e[0]+'</div>'
-          +'<div style="font-size:11px;color:#636366;margin-top:1px;">AED '+e[1].toLocaleString('en-AE',{minimumFractionDigits:2,maximumFractionDigits:2})+' <span style="color:'+CHART_COLORS[i%CHART_COLORS.length]+';font-weight:700;">('+((e[1]/total)*100).toFixed(0)+'%)</span></div>'
+          +'<div style="font-size:11px;color:#636366;margin-top:1px;">'
+          +'AED '+e[1].toLocaleString('en-AE',{minimumFractionDigits:2,maximumFractionDigits:2})
+          +' <span style="color:'+CHART_COLORS[i%CHART_COLORS.length]+';font-weight:700;">('+((e[1]/total)*100).toFixed(0)+'%)</span>'
+          +(prevAmt>0?'<span style="color:var(--ink3);"> vs AED '+prevAmt.toLocaleString('en-AE',{maximumFractionDigits:0})+'</span>':'')
           +'</div>'
+          +'</div>'
+          +trendHtml
           +'<span style="font-size:13px;color:var(--ink3);">›</span>'
           +'</div>';
       }).join('')
+      +'</div>'
+      // Legend key
+      +'<div style="padding:6px 8px;font-size:10px;color:var(--ink3);border-top:1px solid var(--bd);margin-top:4px;display:flex;gap:10px;flex-wrap:wrap;">'
+      +(type==='e'?'<span style="color:#FF3B30;">↑ = spending more</span><span style="color:#34C759;">↓ = spending less</span>':'<span style="color:#34C759;">↑ = earning more</span><span style="color:#FF3B30;">↓ = earning less</span>')
       +'</div>';
   }
 }
