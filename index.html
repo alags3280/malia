@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Malia"/>
 <meta name="theme-color" content="#5E3FD8"/>
-<title>Malia v3.6</title>
+<title>Malia v3.8</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -247,7 +247,7 @@ select.fi option{background:#fff}
 <div id="pg-home" class="pg on">
   <div class="home-hdr">
     <div>
-      <div class="home-greet">Welcome back 👋 <span style="font-size:10px;background:var(--vil);color:var(--vi);font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle;">v3.6</span></div>
+      <div class="home-greet">Welcome back 👋 <span style="font-size:10px;background:var(--vil);color:var(--vi);font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle;">v3.8</span></div>
       <div class="home-name">Hi, <span id="hName">Alags</span>! ⭐</div>
     </div>
     <div class="home-btns">
@@ -424,24 +424,30 @@ select.fi option{background:#fff}
 <!-- ══ CREDIT CARDS ══ -->
 <div id="pg-cards" class="pg">
   <div class="ph">
-    <div><div class="ph-title">Credit Cards</div><div class="ph-sub">Track balances & payments</div></div>
+    <div><div class="ph-title">Cards & Payments</div><div class="ph-sub">Cards, statements & recurring</div></div>
     <button class="ph-fab" onclick="openAddCardMod()">
       <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </button>
   </div>
   <!-- Upload statement button -->
-  <div style="padding:0 20px 14px;display:flex;gap:10px;">
-    <button onclick="document.getElementById('stmtFileIn').click()" style="flex:1;background:#E8F0FF;border:none;color:#1565c0;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;padding:12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">📄 Upload CC Statement (CSV / PDF)</button>
+  <div style="padding:0 20px 10px;display:flex;gap:10px;">
+    <button onclick="document.getElementById('stmtFileIn').click()" style="flex:1;background:#E8F0FF;border:none;color:#1565c0;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;padding:12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">📄 Upload CC Statement</button>
     <input type="file" id="stmtFileIn" accept=".csv,.txt,.pdf" style="display:none;" onchange="handleStmtUpload(event)"/>
   </div>
   <!-- Opening bank balance -->
-  <div style="padding:0 20px 14px;">
+  <div style="padding:0 20px 10px;">
     <button onclick="openOpeningBalMod()" style="width:100%;background:var(--vil);border:none;color:var(--vi);font-family:'Inter',sans-serif;font-size:13px;font-weight:700;padding:12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">🏦 Set Opening Bank Balance</button>
+  </div>
+  <!-- Recurring / Quarterly Payments -->
+  <div style="padding:0 20px 10px;">
+    <button onclick="openRecurringMod()" style="width:100%;background:#FFF3E0;border:none;color:#E65100;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;padding:12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">🔄 Recurring & Quarterly Payments</button>
   </div>
   <!-- Summary bar -->
   <div style="display:flex;gap:10px;padding:0 20px 16px;" id="cardSummary"></div>
   <!-- Cards list -->
   <div id="cardsList" style="padding:0 20px;display:flex;flex-direction:column;gap:14px;"></div>
+  <!-- Recurring list -->
+  <div style="padding:0 20px;" id="recurringList"></div>
   <div style="height:16px;"></div>
 </div>
 
@@ -466,6 +472,52 @@ select.fi option{background:#fff}
 
 <!-- Toast notification -->
 <div id="toastBar" style="position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);background:#1C1C1E;color:#fff;font-size:13px;font-weight:600;padding:12px 24px;border-radius:99px;z-index:900;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.25);"></div>
+
+<!-- Recurring / Quarterly Payments Modal -->
+<div class="ov" id="recurringOv" onclick="cMod('recurringOv',event)">
+  <div class="modal" style="max-height:92vh;overflow-y:auto;">
+    <div class="mh"></div>
+    <div class="mt">Recurring & Quarterly Payments</div>
+    <div class="info-box">Add quarterly or annual payments (e.g. rent, insurance) and Malia will automatically split and record them as monthly expenses.</div>
+
+    <!-- Add new recurring payment -->
+    <div style="background:var(--bg);border-radius:14px;padding:14px;margin-bottom:16px;">
+      <div style="font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.4px;text-transform:uppercase;margin-bottom:10px;">Add New Recurring Payment</div>
+      <div class="fg"><label class="fl">Description</label><input class="fi" type="text" id="recDesc" placeholder="e.g. Villa Rent, Car Insurance"/></div>
+      <div class="fg"><label class="fl">Category</label><select class="fi" id="recCat"></select></div>
+      <div class="fg"><label class="fl">Total Amount (AED)</label><input class="fi" type="number" id="recAmt" placeholder="e.g. 90000" min="0" oninput="updRecFreqLabel()"/></div>
+      <div class="fg">
+        <label class="fl">Frequency</label>
+        <select class="fi" id="recFreq" onchange="updRecFreqLabel()">
+          <option value="3">Quarterly (every 3 months)</option>
+          <option value="6">Half-yearly (every 6 months)</option>
+          <option value="12">Annual (yearly)</option>
+          <option value="2">Bi-monthly (every 2 months)</option>
+          <option value="1">Monthly</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Payment Start Date</label><input class="fi" type="date" id="recStart"/></div>
+      <div style="background:var(--vil);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--vi);font-weight:600;" id="recPreview"></div>
+      <button onclick="saveRecurring()" style="width:100%;background:var(--vi);border:none;color:#fff;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;padding:13px;border-radius:12px;cursor:pointer;">Add Recurring Payment</button>
+    </div>
+
+    <!-- Existing recurring payments -->
+    <div style="font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.4px;text-transform:uppercase;margin-bottom:10px;">Active Recurring Payments</div>
+    <div id="recList"></div>
+    <button class="cbtn" onclick="cMod('recurringOv')">Close</button>
+  </div>
+</div>
+
+<!-- Apply Recurring Preview Modal -->
+<div class="ov" id="recApplyOv" onclick="cMod('recApplyOv',event)">
+  <div class="modal" style="max-height:88vh;overflow-y:auto;">
+    <div class="mh"></div>
+    <div class="mt">Apply Monthly Apportionment</div>
+    <div id="recApplyBody"></div>
+    <button class="sbtn" onclick="confirmApplyRec()">Confirm & Apply</button>
+    <button class="cbtn" onclick="cMod('recApplyOv')">Cancel</button>
+  </div>
+</div>
 
 <!-- CC Statement Review Modal -->
 <div class="ov" id="stmtOv">
@@ -726,6 +778,36 @@ function getICO(cat){var all=D.ec.concat(D.ic);for(var i=0;i<all.length;i++){var
 function catName(c){var p=c.split('|');return p.length>1?p[1]:p[0];}
 function emoLabel(c){var p=c.split('|');return p.length>1?p[0]:(ICO[p[0]]||'');}
 function moT(m,y){return D.txns.filter(function(t){var d=new Date(t.date);return d.getMonth()===m&&d.getFullYear()===y;});}
+
+// Billing cycle: 9th of month to 8th of next month
+var CYCLE_DAY=9;
+function cycleT(m,y){
+  // Cycle "m/y" = 9th of m/y to 8th of (m+1)/y
+  var start=new Date(y,m,CYCLE_DAY);
+  var endM=m+1,endY=y;
+  if(endM>11){endM=0;endY++;}
+  var end=new Date(endY,endM,CYCLE_DAY);
+  return D.txns.filter(function(t){
+    var d=new Date(t.date+'T00:00:00');
+    return d>=start&&d<end;
+  });
+}
+// Get current billing cycle month/year label
+function currentCycle(){
+  var now=new Date();
+  // If today is before 9th, we are in previous month's cycle
+  if(now.getDate()<CYCLE_DAY){
+    var m=now.getMonth()-1,y=now.getFullYear();
+    if(m<0){m=11;y--;}
+    return{mo:m,yr:y};
+  }
+  return{mo:now.getMonth(),yr:now.getFullYear()};
+}
+function cycleLbl(m,y){
+  var endM=m+1,endY=y;
+  if(endM>11){endM=0;endY++;}
+  return MOS3[m]+' '+y+' ('+CYCLE_DAY+' '+MOS3[m]+' – '+8+' '+MOS3[endM]+')';
+}
 
 // ── MONTHLY NET SAVINGS ──
 function getMonthlyNet(){
@@ -1290,7 +1372,189 @@ function openCatMod(type){eCT=type;eCI=null;document.getElementById('catMT').tex
 function openEC(type,idx){eCT=type;eCI=idx;var c=(type==='exp'?D.ec:D.ic)[idx];var p=c.split('|');document.getElementById('catMT').textContent='Edit Category';document.getElementById('catSBtn').textContent='Save Changes';document.getElementById('catEmo').value=p.length>1?p[0]:'';document.getElementById('catNm').value=p.length>1?p[1]:p[0];document.getElementById('catOv').classList.add('on');}
 function saveCat(){var name=document.getElementById('catNm').value.trim(),em=document.getElementById('catEmo').value.trim()||'📌';if(!name)return;var entry=em+'|'+name;var cats=eCT==='exp'?D.ec:D.ic;if(eCI!==null)cats[eCI]=entry;else cats.push(entry);sv();cMod('catOv');rCats();setTT(tType);}
 function dCat(type,idx){var cats=type==='exp'?D.ec:D.ic;if(cats.length<=1){alert('Need at least one category.');return;}cats.splice(idx,1);sv();rCats();setTT(tType);}
-// ── OPENING BANK BALANCE ──
+// ── RECURRING / QUARTERLY PAYMENTS ──
+if(!D.recurring)D.recurring=[];
+var recApplyData=[];
+
+function openRecurringMod(){
+  if(!D.recurring)D.recurring=[];
+  document.getElementById('recStart').value=td();
+  document.getElementById('recDesc').value='';
+  document.getElementById('recAmt').value='';
+  // Populate category dropdown with expense cats
+  var sel=document.getElementById('recCat');
+  sel.innerHTML=D.ec.map(function(c){var n=catName(c);return '<option value="'+n+'">'+emoLabel(c)+' '+n+'</option>';}).join('');
+  // Set Rent as default if exists
+  for(var i=0;i<sel.options.length;i++){if(sel.options[i].value==='Rent'){sel.selectedIndex=i;break;}}
+  updRecFreqLabel();
+  renderRecList();
+  document.getElementById('recurringOv').classList.add('on');
+}
+
+function updRecFreqLabel(){
+  var amt=parseFloat(document.getElementById('recAmt').value)||0;
+  var freq=parseInt(document.getElementById('recFreq').value)||3;
+  var monthly=freq>0?amt/freq:amt;
+  var freqNames={1:'Monthly',2:'Bi-monthly',3:'Quarterly',6:'Half-yearly',12:'Annual'};
+  document.getElementById('recPreview').textContent=amt>0
+    ?'Monthly apportionment: AED '+fmt(monthly)+' / month ('+freqNames[freq]+' payment of AED '+fmt(amt)+')'
+    :'Enter amount to see monthly apportionment';
+}
+
+function saveRecurring(){
+  var desc=document.getElementById('recDesc').value.trim();
+  var cat=document.getElementById('recCat').value;
+  var amt=parseFloat(document.getElementById('recAmt').value);
+  var freq=parseInt(document.getElementById('recFreq').value)||3;
+  var start=document.getElementById('recStart').value||td();
+  if(!desc||!amt||amt<=0){alert('Please fill in description and amount.');return;}
+  var monthly=amt/freq;
+  D.recurring.push({
+    id:'r'+Date.now(),
+    desc:desc,
+    cat:cat,
+    totalAmt:amt,
+    freq:freq,
+    monthly:monthly,
+    startDate:start,
+    active:true,
+    appliedMonths:[]
+  });
+  sv();renderRecList();updRecFreqLabel();
+  document.getElementById('recDesc').value='';
+  document.getElementById('recAmt').value='';
+  showToast('✅ Recurring payment added!');
+  // Auto-apply for current and past months
+  autoApplyRecurring();
+}
+
+function renderRecList(){
+  var el=document.getElementById('recList');
+  if(!D.recurring||!D.recurring.length){
+    el.innerHTML='<div style="text-align:center;color:var(--ink3);font-size:13px;padding:16px;">No recurring payments yet.</div>';
+    return;
+  }
+  var freqNames={1:'Monthly',2:'Bi-monthly',3:'Quarterly',6:'Half-yearly',12:'Annual'};
+  el.innerHTML=D.recurring.map(function(r){
+    var nextDate=getNextRecDate(r);
+    var daysLeft=nextDate?Math.ceil((new Date(nextDate)-new Date())/86400000):null;
+    return '<div style="background:var(--card);border-radius:14px;padding:14px;box-shadow:var(--sh);margin-bottom:10px;">'
+      +'<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">'
+      +'<div style="flex:1;">'
+      +'<div style="font-size:15px;font-weight:700;">'+r.desc+'</div>'
+      +'<div style="font-size:12px;color:var(--ink2);margin-top:2px;">'+r.cat+' · '+(freqNames[r.freq]||'Custom')+'</div>'
+      +'</div>'
+      +'<button onclick="delRecurring(\''+r.id+'\')" style="background:none;border:none;cursor:pointer;padding:4px;color:var(--ink3);">🗑️</button>'
+      +'</div>'
+      // Amount breakdown
+      +'<div style="display:flex;gap:8px;margin-bottom:8px;">'
+      +'<div style="flex:1;background:var(--rdl);border-radius:10px;padding:8px;text-align:center;">'
+      +'<div style="font-size:10px;font-weight:700;color:var(--rd);">TOTAL PAYMENT</div>'
+      +'<div style="font-size:15px;font-weight:800;color:var(--rd);">AED '+fmt(r.totalAmt)+'</div>'
+      +'</div>'
+      +'<div style="flex:1;background:var(--aml);border-radius:10px;padding:8px;text-align:center;">'
+      +'<div style="font-size:10px;font-weight:700;color:#E65100;">MONTHLY</div>'
+      +'<div style="font-size:15px;font-weight:800;color:#E65100;">AED '+fmt(r.monthly)+'</div>'
+      +'</div>'
+      +'<div style="flex:1;background:var(--bg);border-radius:10px;padding:8px;text-align:center;">'
+      +'<div style="font-size:10px;font-weight:700;color:var(--ink3);">APPLIED</div>'
+      +'<div style="font-size:15px;font-weight:800;">'+r.appliedMonths.length+'mo</div>'
+      +'</div>'
+      +'</div>'
+      // Next payment date
+      +(nextDate?'<div style="font-size:12px;color:var(--ink2);margin-bottom:8px;">📅 Next payment: <b>'+nextDate+'</b>'+(daysLeft!==null?' ('+daysLeft+' days)':'')+' </div>':'')
+      +'<button onclick="previewApplyRec(\''+r.id+'\')" style="width:100%;background:var(--vil);border:none;color:var(--vi);font-family:\'Inter\',sans-serif;font-size:13px;font-weight:700;padding:10px;border-radius:10px;cursor:pointer;">▶ Apply This Month</button>'
+      +'</div>';
+  }).join('');
+}
+
+function getNextRecDate(r){
+  // Next occurrence of payment after last applied or start date
+  var start=new Date(r.startDate);
+  var now=new Date();
+  var freq=r.freq||3;
+  var next=new Date(start);
+  while(next<=now){next.setMonth(next.getMonth()+freq);}
+  return next.toISOString().split('T')[0];
+}
+
+function delRecurring(id){
+  if(!confirm('Delete this recurring payment?'))return;
+  D.recurring=D.recurring.filter(function(r){return r.id!==id;});
+  sv();renderRecList();showToast('Recurring payment removed');
+}
+
+function previewApplyRec(id){
+  var r=D.recurring.find(function(r){return r.id===id;});if(!r)return;
+  var n=new Date();
+  var moKey=n.getFullYear()+'-'+(n.getMonth()+1);
+  var alreadyApplied=r.appliedMonths.indexOf(moKey)>=0;
+  var body='<div style="background:var(--vil);border-radius:12px;padding:12px;margin-bottom:14px;">'
+    +'<div style="font-size:14px;font-weight:700;color:var(--vi);">'+r.desc+'</div>'
+    +'<div style="font-size:12px;color:var(--vi);margin-top:4px;">Monthly apportionment of <b>AED '+fmt(r.monthly)+'</b> ('+r.freq+'-month payment of AED '+fmt(r.totalAmt)+')</div>'
+    +'</div>'
+    +(alreadyApplied?'<div style="background:#FFF3E0;border-radius:10px;padding:10px;margin-bottom:12px;font-size:12px;color:#E65100;font-weight:600;">⚠️ Already applied for '+MOS3[n.getMonth()]+' '+n.getFullYear()+'</div>':'')
+    +'<div style="font-size:13px;color:var(--ink2);margin-bottom:14px;">This will add an expense of <b>AED '+fmt(r.monthly)+'</b> under <b>'+r.cat+'</b> for <b>'+MOS3[n.getMonth()]+' '+n.getFullYear()+'</b>.</div>';
+  recApplyData=[{id:id,month:moKey,mo:n.getMonth(),yr:n.getFullYear()}];
+  document.getElementById('recApplyBody').innerHTML=body;
+  document.getElementById('recApplyOv').classList.add('on');
+}
+
+function autoApplyRecurring(){
+  // Apply for all months from start to current month that haven't been applied yet
+  if(!D.recurring)return;
+  var now=new Date();
+  D.recurring.forEach(function(r){
+    var start=new Date(r.startDate);
+    var cur=new Date(start.getFullYear(),start.getMonth(),1);
+    var end=new Date(now.getFullYear(),now.getMonth(),1);
+    while(cur<=end){
+      var moKey=cur.getFullYear()+'-'+(cur.getMonth()+1);
+      if(r.appliedMonths.indexOf(moKey)<0){
+        // Apply this month
+        var dateStr=cur.getFullYear()+'-'+String(cur.getMonth()+1).padStart(2,'0')+'-01';
+        D.txns.push({id:Date.now()+Math.random(),type:'e',amount:r.monthly,category:r.cat,note:r.desc+' (monthly apportionment)',date:dateStr,source:'Recurring'});
+        r.appliedMonths.push(moKey);
+      }
+      cur.setMonth(cur.getMonth()+1);
+    }
+  });
+  sv();rHome();if(curPg==='transactions')rTxns();
+}
+
+function confirmApplyRec(){
+  if(!recApplyData.length)return;
+  var d=recApplyData[0];
+  var r=D.recurring.find(function(r){return r.id===d.id;});if(!r)return;
+  var dateStr=d.yr+'-'+String(d.mo+1).padStart(2,'0')+'-01';
+  D.txns.push({id:Date.now(),type:'e',amount:r.monthly,category:r.cat,note:r.desc+' (monthly apportionment)',date:dateStr,source:'Recurring'});
+  if(r.appliedMonths.indexOf(d.month)<0)r.appliedMonths.push(d.month);
+  autoApplyAlloc();sv();cMod('recApplyOv');rHome();if(curPg==='transactions')rTxns();
+  renderRecList();
+  showToast('✅ AED '+fmt(r.monthly)+' added for '+MOS3[d.mo]+' '+d.yr);
+}
+
+// Show recurring list on cards page
+function rRecurringSection(){
+  var el=document.getElementById('recurringList');
+  if(!el)return;
+  if(!D.recurring||!D.recurring.length){el.innerHTML='';return;}
+  var freqNames={1:'Monthly',2:'Bi-monthly',3:'Quarterly',6:'Half-yearly',12:'Annual'};
+  el.innerHTML='<div style="font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.4px;text-transform:uppercase;margin-bottom:10px;margin-top:4px;">Recurring Payments</div>'
+    +D.recurring.map(function(r){
+      return '<div style="background:var(--card);border-radius:14px;padding:14px;box-shadow:var(--sh);margin-bottom:10px;display:flex;align-items:center;gap:12px;">'
+        +'<div style="width:44px;height:44px;background:#FFF3E0;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🔄</div>'
+        +'<div style="flex:1;min-width:0;">'
+        +'<div style="font-size:14px;font-weight:700;">'+r.desc+'</div>'
+        +'<div style="font-size:12px;color:var(--ink2);margin-top:2px;">'+freqNames[r.freq]+' · AED '+fmt(r.monthly)+'/mo</div>'
+        +'</div>'
+        +'<div style="text-align:right;">'
+        +'<div style="font-size:15px;font-weight:800;color:#E65100;">AED '+fmt(r.totalAmt)+'</div>'
+        +'<div style="font-size:11px;color:var(--ink3);">total</div>'
+        +'</div>'
+        +'</div>';
+    }).join('');
+}
 function openOpeningBalMod(){
   document.getElementById('obDate').value=td();
   document.getElementById('obAmt').value='';
@@ -1379,11 +1643,13 @@ function parseStatement(text,filename){
       headerIdx=i;
       var headers=splitCSV(lines[i]);
       headers.forEach(function(h,idx){
-        var hl=h.toLowerCase().trim().replace(/^"|"$/g,'');
-        if(/^(date|transaction date|value date|trans date|posting date)$/.test(hl))dateCol=idx;
-        if(/^(description|narration|particulars|transaction description|details|merchant|remarks)$/.test(hl))descCol=idx;
-        if(/^(amount|transaction amount|debit|debit amount|withdrawal)$/.test(hl))amtCol=idx;
-        if(/^(credit|credit amount|deposit)$/.test(hl))crCol=idx;
+        var hl=h.toLowerCase().trim().replace(/^"|"$/g,'').replace(/\s+/g,' ');
+        if(/^(date|transaction date|value date|trans date|posting date|txn date|book date)$/.test(hl))dateCol=idx;
+        if(/^(description|narration|particulars|transaction description|details|merchant|remarks|reference|transaction details|txn details|beneficiary)$/.test(hl))descCol=idx;
+        if(/^(amount|transaction amount|debit|debit amount|withdrawal|dr amount|withdrawals|dr)$/.test(hl))amtCol=idx;
+        if(/^(credit|credit amount|deposit|cr amount|deposits|cr)$/.test(hl))crCol=idx;
+        // If single "amount" col exists but no separate credit col, detect from values
+        if(/^(balance)$/.test(hl)){} // skip balance column
       });
       break;
     }
@@ -1402,9 +1668,18 @@ function parseStatement(text,filename){
     if(Math.abs(amt)<0.01&&Math.abs(cr)<0.01)continue;
     var parsedDate=parseStmtDate(dateStr);
     if(!parsedDate)continue;
+
+    // Smart income/expense detection
     var type='e';
-    if(cr>0&&amt<=0){type='i';amt=cr;}
+    var rawLine=cols.join(' ').toLowerCase();
+    // 1. Separate credit column has value → income
+    if(cr>0&&(amt<=0.01||amtCol===crCol))  {type='i';amt=cr;}
+    // 2. Amount is negative → income (credit)
     else if(amt<0){type='i';amt=Math.abs(amt);}
+    // 3. CR suffix or credit keyword in description or row
+    else if(/\bCR\b|credited|credit|refund|reversal|salary|deposit|received|cashback/i.test(rawLine)&&!/debit|dr\b|charged|withdrawn/i.test(rawLine)){type='i';}
+    // 4. Amount column header was "credit" → income
+    else if(crCol>=0&&amtCol===crCol&&amt>0){type='i';}
     // Auto-categorise: history first, then keywords, then create new
     var cat=getCatFromHistory(desc,type)||'';
     if(!cat){
@@ -1753,6 +2028,8 @@ function rCards(){
       +'</div>'
       +'</div></div>';
   }).join('');
+  // Show recurring section below cards
+  rRecurringSection();
 }
 
 function calcOwed(c){
@@ -2104,7 +2381,7 @@ function showToast(msg){
   setTimeout(function(){t.style.opacity='0';t.style.transform='translateY(20px)';},1500);
 }
 
-setTT('e');setSmsT('e');lProf();initSmsUrl();hUrlSms();autoApplyAlloc();rHome();
+setTT('e');setSmsT('e');lProf();initSmsUrl();hUrlSms();autoApplyAlloc();autoApplyRecurring();rHome();
 
 // Lock viewport height to prevent address bar jump
 (function(){
@@ -2113,7 +2390,8 @@ setTT('e');setSmsT('e');lProf();initSmsUrl();hUrlSms();autoApplyAlloc();rHome();
   window.addEventListener('resize',setVH,{passive:true});
 })();
 
-var rptMo=new Date().getMonth(),rptYr=new Date().getFullYear();
+var _initCycle=currentCycle();
+var rptMo=_initCycle.mo,rptYr=_initCycle.yr;
 function chRptMo(d){
   rptMo+=d;
   if(rptMo>11){rptMo=0;rptYr++;}
@@ -2213,7 +2491,7 @@ function drawDonutFull(canvasId,legendId,catData){
     // Build previous month category totals
     var prevMo=rptMo-1,prevYr=rptYr;
     if(prevMo<0){prevMo=11;prevYr--;}
-    var prevTxns=moT(prevMo,prevYr).filter(function(t){return t.type===type;});
+    var prevTxns=cycleT(prevMo,prevYr).filter(function(t){return t.type===type;});
     var prevCats={};
     prevTxns.forEach(function(t){prevCats[t.category]=(prevCats[t.category]||0)+t.amount;});
 
@@ -2262,7 +2540,7 @@ function drawDonutFull(canvasId,legendId,catData){
 
 // ── CATEGORY DRILL DOWN ──
 function openCatDrill(cat,type){
-  var txns=moT(rptMo,rptYr).filter(function(t){return t.category===cat&&t.type===type;});
+  var txns=cycleT(rptMo,rptYr).filter(function(t){return t.category===cat&&t.type===type;});
   var total=txns.reduce(function(a,t){return a+t.amount;},0);
   var ico=getICO(cat);
   document.getElementById('catDrillTitle').textContent=ico+' '+cat;
@@ -2289,20 +2567,20 @@ function openCatDrill(cat,type){
 // Wire up legend IDs correctly when calling drawDonut
 function rReports(){
   var mo=rptMo,yr=rptYr;
-  document.getElementById('rptMoLbl').textContent=MOS3[mo]+' '+yr;
+  document.getElementById('rptMoLbl').textContent=cycleLbl(mo,yr);
 
-  // Build last 6 months in correct chronological order
+  // Build last 6 billing cycles in chronological order
   var months=[];
   for(var i=5;i>=0;i--){
     var m=mo-i,y=yr;
     if(m<0){m+=12;y--;}
-    var txns=moT(m,y);
+    var txns=cycleT(m,y);
     var inc=txns.filter(function(t){return t.type==='i';}).reduce(function(a,t){return a+t.amount;},0);
     var exp=txns.filter(function(t){return t.type==='e';}).reduce(function(a,t){return a+t.amount;},0);
     months.push({lbl:MOS3[m],inc:inc,exp:exp,mo:m,yr:y});
   }
 
-  // Clear canvases first to avoid stale renders
+  // Clear canvases
   ['rptBarChart','rptExpDonut','rptIncDonut'].forEach(function(id){
     var cv=document.getElementById(id);
     if(cv){var ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);}
@@ -2310,8 +2588,8 @@ function rReports(){
 
   drawBarChart('rptBarChart',months);
 
-  // Selected month transactions
-  var selTxns=moT(mo,yr);
+  // Selected billing cycle transactions
+  var selTxns=cycleT(mo,yr);
 
   // Expense donut
   var catExp={};
